@@ -14,13 +14,13 @@ namespace Rhetris
     /// <summary>
     /// This is the main type for your game
     /// </summary>
-    public class Game1 : Game
+    public class Rhetris : Game
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
         Texture2D[] square;
         
-        public Game1()
+        public Rhetris()
             : base()
         {
             graphics = new GraphicsDeviceManager(this);
