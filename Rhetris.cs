@@ -67,9 +67,9 @@ namespace Rhetris
             }
             if (_clearNextFigure != null)
             {
-                _drawer.DrawNextFigure(_gamelogic.nextFigure, (uint)BlockType.Alive);
-            }
-            _drawer.DrawNextFigure(_clearNextFigure, (uint)BlockType.Empty);
+                _drawer.DrawNextFigure(_clearNextFigure, (uint)BlockType.Empty);
+            }            
+            _drawer.DrawNextFigure(_gamelogic.nextFigure, (uint)BlockType.Alive);
             _drawer.DrawAll();
             _drawer.DrawFigure(_gamelogic.figure,(uint) BlockType.Alive);
             base.Draw(gameTime);
