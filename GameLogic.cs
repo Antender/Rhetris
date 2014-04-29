@@ -151,6 +151,7 @@ namespace Rhetris
             {
                 Blocks[block.X, block.Y] = (uint) BlockType.Dead;
             }
+            CheckDeleted();
         }
 
         public bool CanSwap()
@@ -218,6 +219,41 @@ namespace Rhetris
                 Figure = temp;
             }
             return rotated;
+        }
+
+        public void CheckDeleted()
+        {
+            var shift = 0;
+            for (var i = _parent.Height-2; i >= shift; i--)
+            {
+                var full = true;
+                for (var j = 1; j < _parent.Width-1; j++)
+                {
+                    if (Blocks[j, i] == (uint) BlockType.Empty)
+                    {
+                        full = false;
+                        break;
+                    }
+                }
+                if (full)
+                {
+                    shift++;
+                }
+                if (shift > 0)
+                {
+                    for (var j = 1; j < _parent.Width-1; j++)
+                    {
+                        Blocks[j, i] = Blocks[j, i-shift];
+                    }
+                }
+            }
+            for (var i = 0; i < shift; i++)
+            {
+                for (var j = 1; j < _parent.Width-1; j++)
+                {
+                    Blocks[j, i] = (uint) BlockType.Empty;
+                }
+            }
         }
     }
 }

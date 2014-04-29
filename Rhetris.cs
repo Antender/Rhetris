@@ -33,7 +33,7 @@ namespace Rhetris
 
         protected override void Update(GameTime gameTime)
         {
-            if (gameTime.TotalGameTime.TotalMilliseconds - _previousUpdate > 100)
+            if (gameTime.TotalGameTime.TotalMilliseconds - _previousUpdate > 70)
             {
 
                 if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed ||
@@ -70,6 +70,7 @@ namespace Rhetris
                     {
                         _gamelogic.Move(new Point(0,1));
                     }
+                    _clearNextFigure = _gamelogic.NextFigure;
                     _gamelogic.KillFigure();
                     _gamelogic.PlaceFigure();
                 }
@@ -93,6 +94,7 @@ namespace Rhetris
                 }
                 else
                 {
+                    _clearNextFigure = _gamelogic.NextFigure;
                     _gamelogic.KillFigure();
                     _gamelogic.PlaceFigure();
                 }
