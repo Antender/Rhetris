@@ -9,16 +9,17 @@ namespace Rhetris
         private readonly Drawer _drawer;
         private readonly GameLogic _gamelogic;
         private readonly Random _random;
-        private Point[] _clearFigure;
         private Point[] _clearNextFigure;
         private double _previousUpdate;
         public int Width = 12;
         public int Height = 23;
         public int FigNum = 7;
+        
         public int Rnd(int max)
         {
             return _random.Next(max);
         }
+        
         public Rhetris()
         {
             Content.RootDirectory = "Content";
@@ -26,16 +27,6 @@ namespace Rhetris
             _drawer = new Drawer(this, _gamelogic.Blocks);
             _random = new Random();
             _gamelogic.NewGame();
-        }
-
-        protected override void LoadContent()
-        {
-            
-        }
-
-        protected override void UnloadContent()
-        {
-
         }
 
         protected override void Update(GameTime gameTime)
@@ -80,6 +71,16 @@ namespace Rhetris
                     _gamelogic.KillFigure();
                     _gamelogic.PlaceFigure();
                 }
+                if (GamePad.GetState(PlayerIndex.One).Buttons.B == ButtonState.Pressed ||
+                    Keyboard.GetState().IsKeyDown(Keys.Z))
+                {
+                    _gamelogic.RotateClockwize();
+                }
+                if (GamePad.GetState(PlayerIndex.One).Buttons.A == ButtonState.Pressed ||
+                    Keyboard.GetState().IsKeyDown(Keys.X))
+                {
+                    _gamelogic.RotateCounterClockwize();
+                }
                 _previousUpdate = gameTime.TotalGameTime.TotalMilliseconds;
             }
 
@@ -88,10 +89,6 @@ namespace Rhetris
 
         protected override void Draw(GameTime gameTime)
         {
-            if (_clearFigure != null)
-            {
-                _drawer.DrawFigure(_clearFigure,(uint) BlockType.Empty);
-            }
             if (_clearNextFigure != null)
             {
                 _drawer.DrawNextFigure(_clearNextFigure, (uint)BlockType.Empty);

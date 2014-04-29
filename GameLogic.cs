@@ -179,5 +179,44 @@ namespace Rhetris
             nextFigure = temp;
             return cleared;
         }
-    }
+        public bool RotateClockwize()
+        {
+            var origin = figure[0];
+            var temp = new Point[figure.Length];
+            var rotated = true;
+            for (var i=0; i<figure.Length; i++)
+            {
+                temp[i] = new Point(origin.X-figure[i].Y+origin.Y,figure[i].X-origin.X+origin.Y);
+                if (temp[i].X>=0 && temp[i].Y>=0 && Blocks[temp[i].X,temp[i].Y]!=(uint) BlockType.Empty) 
+                {
+                    rotated = false;
+                    break;
+                }
+            }
+            if (rotated)
+            {
+                figure = temp;
+            }
+            return rotated;
+        }
+        public bool RotateCounterClockwize()
+        {
+            var origin = figure[0];
+            var temp = new Point[figure.Length];
+            var rotated = true;
+            for (var i=0; i<figure.Length; i++)
+            {
+                temp[i] = new Point(origin.X+figure[i].Y-origin.Y,origin.Y-figure[i].X+origin.X);
+                if (temp[i].X>=0 && temp[i].Y>=0 && Blocks[temp[i].X,temp[i].Y]!=(uint) BlockType.Empty) 
+                {
+                    rotated = false;
+                    break;
+                }
+            }
+            if (rotated)
+            {
+                figure = temp;
+            }
+            return rotated;
+        }        
 }
