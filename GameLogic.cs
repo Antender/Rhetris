@@ -134,9 +134,17 @@ namespace Rhetris
             return Blocks[pos.X, pos.Y];
         }
 
-        bool CanMove(Point direction)
+        public bool CanMove(Point direction)
         {
             return figure.All(block => Blocks[block.X + direction.X, block.Y + direction.Y] == (uint) BlockType.Empty);
+        }
+
+        public void Move(Point direction)
+        {
+            for (var i = 0; i < figure.Length; i++)
+            {
+                figure[i] = new Point(figure[i].X + direction.X,figure[i].Y + direction.Y);
+            }
         }
     }
 }

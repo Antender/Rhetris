@@ -59,7 +59,7 @@ namespace Rhetris
             _spriteBatch.Draw(_palette[blocktype],new Rectangle(x*Blockwidth,y*Blockheight,Blockwidth,Blockheight),Color.White);
         }
 
-        public void DrawAll()
+        public void DrawField()
         {
             Lock();
             for (var x = 0; x < _parent.Width; ++x)
@@ -88,21 +88,6 @@ namespace Rhetris
             foreach (var block in figure)
             {
                 Draw(block.X + nextFigure.X, block.Y + nextFigure.Y, blocktype);
-            }
-            Unlock();
-        }
-
-        public void DrawWalls()
-        {
-            Lock();
-            for (var i = 0; i < _parent.Width; i++)
-            {
-                Draw(i,_parent.Height-1,(uint) BlockType.Wall);
-            }
-            for (var i = 0; i < _parent.Height-1; i++)
-            {
-                Draw(0, i,(uint) BlockType.Wall);
-                Draw(_parent.Width-1, i, (uint)BlockType.Wall);
             }
             Unlock();
         }

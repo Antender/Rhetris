@@ -53,6 +53,22 @@ namespace Rhetris
                     _clearNextFigure = _gamelogic.nextFigure;
                     _gamelogic.PlaceFigure();
                 }
+                if (GamePad.GetState(PlayerIndex.One).Buttons.LeftShoulder == ButtonState.Pressed ||
+                    Keyboard.GetState().IsKeyDown(Keys.Left))
+                {
+                    if (_gamelogic.CanMove(new Point(-1, 0)))
+                    {
+                        _gamelogic.Move(new Point(-1,0));
+                    }
+                }
+                if (GamePad.GetState(PlayerIndex.One).Buttons.RightShoulder == ButtonState.Pressed ||
+    Keyboard.GetState().IsKeyDown(Keys.Right))
+                {
+                    if (_gamelogic.CanMove(new Point(1, 0)))
+                    {
+                        _gamelogic.Move(new Point(1, 0));
+                    }
+                }
                 _previousUpdate = gameTime.TotalGameTime.TotalMilliseconds;
             }
 
@@ -70,7 +86,7 @@ namespace Rhetris
                 _drawer.DrawNextFigure(_clearNextFigure, (uint)BlockType.Empty);
             }            
             _drawer.DrawNextFigure(_gamelogic.nextFigure, (uint)BlockType.Alive);
-            _drawer.DrawAll();
+            _drawer.DrawField();
             _drawer.DrawFigure(_gamelogic.figure,(uint) BlockType.Alive);
             base.Draw(gameTime);
         }
