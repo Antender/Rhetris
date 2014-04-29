@@ -49,9 +49,10 @@ namespace Rhetris
                 if (GamePad.GetState(PlayerIndex.One).Buttons.A == ButtonState.Pressed ||
                     Keyboard.GetState().IsKeyDown(Keys.Space))
                 {
-                    _clearFigure = _gamelogic.figure;
-                    _clearNextFigure = _gamelogic.nextFigure;
-                    _gamelogic.PlaceFigure();
+                    if (_gamelogic.CanSwap())
+                    {
+                        _clearNextFigure = _gamelogic.SwapFigure();
+                    }
                 }
                 if (GamePad.GetState(PlayerIndex.One).Buttons.LeftShoulder == ButtonState.Pressed ||
                     Keyboard.GetState().IsKeyDown(Keys.Left))
@@ -68,6 +69,16 @@ namespace Rhetris
                     {
                         _gamelogic.Move(new Point(1, 0));
                     }
+                }
+                if (GamePad.GetState(PlayerIndex.One).Buttons.X == ButtonState.Pressed ||
+                    Keyboard.GetState().IsKeyDown(Keys.Down))
+                {
+                    while (_gamelogic.CanMove(new Point(0, 1)))
+                    {
+                        _gamelogic.Move(new Point(0,1));
+                    }
+                    _gamelogic.KillFigure();
+                    _gamelogic.PlaceFigure();
                 }
                 _previousUpdate = gameTime.TotalGameTime.TotalMilliseconds;
             }

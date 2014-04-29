@@ -146,5 +146,38 @@ namespace Rhetris
                 figure[i] = new Point(figure[i].X + direction.X,figure[i].Y + direction.Y);
             }
         }
+
+        public void KillFigure()
+        {
+            foreach (var block in figure)
+            {
+                Blocks[block.X, block.Y] = (uint) BlockType.Dead;
+            }
+        }
+
+        public bool CanSwap()
+        {
+            var origin = figure[0];
+            return nextFigure.All(block => Blocks[block.X + origin.X, block.Y + origin.Y] == (uint) BlockType.Empty);
+        }
+
+        public Point[] SwapFigure()
+        {
+            var origin = figure[0];
+            var newNextFigure = new Point[nextFigure.Length];
+            var cleared = nextFigure;
+            for (var i = 0; i < figure.Length; i++)
+            {
+                figure[i] = new Point(figure[i].X - origin.X, figure[i].Y - origin.Y);
+            }
+            for (var i = 0; i < nextFigure.Length; i++)
+            {
+                newNextFigure[i] = new Point(nextFigure[i].X + origin.X, nextFigure[i].Y + origin.Y);
+            }
+            var temp = figure;
+            figure = newNextFigure;
+            nextFigure = temp;
+            return cleared;
+        }
     }
 }
