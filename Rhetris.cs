@@ -11,9 +11,11 @@ namespace Rhetris
         private readonly Random _random;
         private Point[] _clearNextFigure;
         private double _previousUpdate;
+        private double _previousMovement;
         public int Width = 12;
         public int Height = 23;
         public int FigNum = 7;
+        private int speed = 1;
         
         public int Rnd(int max)
         {
@@ -83,7 +85,19 @@ namespace Rhetris
                 }
                 _previousUpdate = gameTime.TotalGameTime.TotalMilliseconds;
             }
-
+            if ((gameTime.TotalGameTime.TotalMilliseconds - _previousMovement) > (2000.0/speed))
+            {
+                if (_gamelogic.CanMove(new Point(0,1)))
+                {
+                    _gamelogic.Move(new Point(0,1));
+                }
+                else
+                {
+                    _gamelogic.KillFigure();
+                    _gamelogic.PlaceFigure();
+                }
+                _previousMovement = gameTime.TotalGameTime.TotalMilliseconds;
+            }
             base.Update(gameTime);
         }
 
