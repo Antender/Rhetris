@@ -1,7 +1,4 @@
-﻿using System;
-using System.Dynamic;
-using System.Linq;
-using System.Net.Sockets;
+﻿using System.Linq;
 using Microsoft.Xna.Framework;
 
 namespace Rhetris
@@ -24,11 +21,12 @@ namespace Rhetris
         T = 5,
         Z = 6
     }
+
     class GameLogic
     {
-        public Point[] figure;
-        public Point[] nextFigure;
-        private Point[][] figures;
+        public Point[] Figure;
+        public Point[] NextFigure;
+        private Point[][] _figures;
         private readonly Rhetris _parent;
         public uint[,] Blocks;
         public Point Start;
@@ -37,75 +35,75 @@ namespace Rhetris
         {
             _parent = main;
             Blocks = new uint[main.Width, main.Height];
-            Start = new Point(_parent.Width/2,0);
+            Start = new Point(_parent.Width/2, 0);
             CreateFigures();
         }
 
         private void CreateFigures()
         {
-            figures = new Point[_parent.FigNum][];
-            figures[(uint)Tetromino.I] = new []
+            _figures = new Point[_parent.FigNum][];
+            _figures[(uint) Tetromino.I] = new[]
             {
                 new Point(0, 0),
                 new Point(-1, 0),
                 new Point(1, 0),
-                new Point(2, 0) 
+                new Point(2, 0)
             };
-            figures[(uint)Tetromino.J] = new []
+            _figures[(uint) Tetromino.J] = new[]
             {
                 new Point(0, 0),
                 new Point(-1, 0),
-                new Point(1, 0), 
-                new Point(1, 1) 
+                new Point(1, 0),
+                new Point(1, 1)
             };
-            figures[(uint) Tetromino.L] = new []
+            _figures[(uint) Tetromino.L] = new[]
             {
                 new Point(0, 0),
-                new Point(-1,0),
-                new Point(-1,1),
-                new Point(1,0) 
+                new Point(-1, 0),
+                new Point(-1, 1),
+                new Point(1, 0)
             };
-            figures[(uint) Tetromino.O] = new []
+            _figures[(uint) Tetromino.O] = new[]
             {
-                new Point(0,0),
-                new Point(0,1),
-                new Point(1,0),
-                new Point(1,1)
+                new Point(0, 0),
+                new Point(0, 1),
+                new Point(1, 0),
+                new Point(1, 1)
             };
-            figures[(uint) Tetromino.S] = new []
+            _figures[(uint) Tetromino.S] = new[]
             {
-                new Point(0,0),
-                new Point(1,0),
-                new Point(0,1),
-                new Point(-1,1) 
+                new Point(0, 0),
+                new Point(1, 0),
+                new Point(0, 1),
+                new Point(-1, 1)
             };
-            figures[(uint) Tetromino.T] = new []
+            _figures[(uint) Tetromino.T] = new[]
             {
-                new Point(0,0),
-                new Point(1,0),
-                new Point(-1,0),
-                new Point(0,1) 
+                new Point(0, 0),
+                new Point(1, 0),
+                new Point(-1, 0),
+                new Point(0, 1)
             };
-            figures[(uint) Tetromino.Z] = new []
+            _figures[(uint) Tetromino.Z] = new[]
             {
-                new Point(0,0),
-                new Point(-1,0),
-                new Point(0,1),
-                new Point(1,1) 
+                new Point(0, 0),
+                new Point(-1, 0),
+                new Point(0, 1),
+                new Point(1, 1)
             };
         }
 
         public void SpawnFigure()
         {
-            nextFigure = (Point[])figures[_parent.Rnd(7)].Clone();
+            NextFigure = (Point[]) _figures[_parent.Rnd(7)].Clone();
         }
 
         public void PlaceFigure()
         {
-            figure = new Point[nextFigure.Length];
-            for (var i = 0; i < nextFigure.Length; i++)
+            Figure = new Point[NextFigure.Length];
+            for (var i = 0; i < NextFigure.Length; i++)
             {
-                figure[i] = new Point(nextFigure[i].X + Start.X, nextFigure[i].Y + Start.Y);
+                Figure[i] = new Point(NextFigure[i].X + Start.X, NextFigure[i].Y + Start.Y);
             }
             SpawnFigure();
         }
@@ -117,11 +115,11 @@ namespace Rhetris
                 Blocks[0, i] = (uint) BlockType.Wall;
                 Blocks[_parent.Width - 1, i] = (uint) BlockType.Wall;
             }
-            for (var i = 1; i < _parent.Width-1; i++)
+            for (var i = 1; i < _parent.Width - 1; i++)
             {
-                for (var j = 0; j < _parent.Width-1; j++)
+                for (var j = 0; j < _parent.Width - 1; j++)
                 {
-                    Blocks[i, j] = (uint)BlockType.Empty;
+                    Blocks[i, j] = (uint) BlockType.Empty;
                 }
                 Blocks[i, _parent.Height - 1] = (uint) BlockType.Wall;
             }
@@ -136,20 +134,20 @@ namespace Rhetris
 
         public bool CanMove(Point direction)
         {
-            return figure.All(block => Blocks[block.X + direction.X, block.Y + direction.Y] == (uint) BlockType.Empty);
+            return Figure.All(block => Blocks[block.X + direction.X, block.Y + direction.Y] == (uint) BlockType.Empty);
         }
 
         public void Move(Point direction)
         {
-            for (var i = 0; i < figure.Length; i++)
+            for (var i = 0; i < Figure.Length; i++)
             {
-                figure[i] = new Point(figure[i].X + direction.X,figure[i].Y + direction.Y);
+                Figure[i] = new Point(Figure[i].X + direction.X, Figure[i].Y + direction.Y);
             }
         }
 
         public void KillFigure()
         {
-            foreach (var block in figure)
+            foreach (var block in Figure)
             {
                 Blocks[block.X, block.Y] = (uint) BlockType.Dead;
             }
@@ -157,37 +155,38 @@ namespace Rhetris
 
         public bool CanSwap()
         {
-            var origin = figure[0];
-            return nextFigure.All(block => Blocks[block.X + origin.X, block.Y + origin.Y] == (uint) BlockType.Empty);
+            var origin = Figure[0];
+            return NextFigure.All(block => Blocks[block.X + origin.X, block.Y + origin.Y] == (uint) BlockType.Empty);
         }
 
         public Point[] SwapFigure()
         {
-            var origin = figure[0];
-            var newNextFigure = new Point[nextFigure.Length];
-            var cleared = nextFigure;
-            for (var i = 0; i < figure.Length; i++)
+            var origin = Figure[0];
+            var newNextFigure = new Point[NextFigure.Length];
+            var cleared = NextFigure;
+            for (var i = 0; i < Figure.Length; i++)
             {
-                figure[i] = new Point(figure[i].X - origin.X, figure[i].Y - origin.Y);
+                Figure[i] = new Point(Figure[i].X - origin.X, Figure[i].Y - origin.Y);
             }
-            for (var i = 0; i < nextFigure.Length; i++)
+            for (var i = 0; i < NextFigure.Length; i++)
             {
-                newNextFigure[i] = new Point(nextFigure[i].X + origin.X, nextFigure[i].Y + origin.Y);
+                newNextFigure[i] = new Point(NextFigure[i].X + origin.X, NextFigure[i].Y + origin.Y);
             }
-            var temp = figure;
-            figure = newNextFigure;
-            nextFigure = temp;
+            var temp = Figure;
+            Figure = newNextFigure;
+            NextFigure = temp;
             return cleared;
         }
+
         public bool RotateClockwize()
         {
-            var origin = figure[0];
-            var temp = new Point[figure.Length];
+            var origin = Figure[0];
+            var temp = new Point[Figure.Length];
             var rotated = true;
-            for (var i=0; i<figure.Length; i++)
+            for (var i = 0; i < Figure.Length; i++)
             {
-                temp[i] = new Point(origin.X-figure[i].Y+origin.Y,figure[i].X-origin.X+origin.Y);
-                if (temp[i].X>=0 && temp[i].Y>=0 && Blocks[temp[i].X,temp[i].Y]!=(uint) BlockType.Empty) 
+                temp[i] = new Point(origin.X - Figure[i].Y + origin.Y, Figure[i].X - origin.X + origin.Y);
+                if ((temp[i].X < 0) || (temp[i].Y < 0) || (Blocks[temp[i].X, temp[i].Y] != (uint) BlockType.Empty))
                 {
                     rotated = false;
                     break;
@@ -195,19 +194,20 @@ namespace Rhetris
             }
             if (rotated)
             {
-                figure = temp;
+                Figure = temp;
             }
             return rotated;
         }
+
         public bool RotateCounterClockwize()
         {
-            var origin = figure[0];
-            var temp = new Point[figure.Length];
+            var origin = Figure[0];
+            var temp = new Point[Figure.Length];
             var rotated = true;
-            for (var i=0; i<figure.Length; i++)
+            for (var i = 0; i < Figure.Length; i++)
             {
-                temp[i] = new Point(origin.X+figure[i].Y-origin.Y,origin.Y-figure[i].X+origin.X);
-                if (temp[i].X>=0 && temp[i].Y>=0 && Blocks[temp[i].X,temp[i].Y]!=(uint) BlockType.Empty) 
+                temp[i] = new Point(origin.X + Figure[i].Y - origin.Y, origin.Y - Figure[i].X + origin.X);
+                if ((temp[i].X < 0) || (temp[i].Y < 0) || (Blocks[temp[i].X, temp[i].Y] != (uint) BlockType.Empty))
                 {
                     rotated = false;
                     break;
@@ -215,8 +215,9 @@ namespace Rhetris
             }
             if (rotated)
             {
-                figure = temp;
+                Figure = temp;
             }
             return rotated;
-        }        
+        }
+    }
 }

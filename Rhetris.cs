@@ -54,7 +54,7 @@ namespace Rhetris
                     }
                 }
                 if (GamePad.GetState(PlayerIndex.One).Buttons.RightShoulder == ButtonState.Pressed ||
-    Keyboard.GetState().IsKeyDown(Keys.Right))
+                    Keyboard.GetState().IsKeyDown(Keys.Right))
                 {
                     if (_gamelogic.CanMove(new Point(1, 0)))
                     {
@@ -93,9 +93,9 @@ namespace Rhetris
             {
                 _drawer.DrawNextFigure(_clearNextFigure, (uint)BlockType.Empty);
             }            
-            _drawer.DrawNextFigure(_gamelogic.nextFigure, (uint)BlockType.Alive);
+            _drawer.DrawNextFigure(_gamelogic.NextFigure, (uint)BlockType.Alive);
             _drawer.DrawField();
-            _drawer.DrawFigure(_gamelogic.figure,(uint) BlockType.Alive);
+            _drawer.DrawFigure(_gamelogic.Figure,(uint) BlockType.Alive);
             base.Draw(gameTime);
         }
     }
