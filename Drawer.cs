@@ -1,27 +1,26 @@
-﻿
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Rhetris
 {
     class Drawer
     {
-        const int Palettewidth = 8;
+        private const int Palettewidth = 8;
         private const int Blockwidth = 32;
         private const int Blockheight = 32;
         private readonly Rhetris _parent;
-        GraphicsDeviceManager graphicsManager;
+        private GraphicsDeviceManager _graphicsManager;
         private GraphicsDevice graphics;
-        readonly SpriteBatch _spriteBatch;
-        readonly Texture2D[] _palette;
+        private readonly SpriteBatch _spriteBatch;
+        private readonly Texture2D[] _palette;
         private readonly uint[,] _gamefield;
-        public Point nextFigure;
+        private Point _nextFigure;
         public Drawer(Rhetris main, uint[,] gamefield)
         {
             _parent = main;
             _gamefield = gamefield;
             graphics = new GraphicsDevice();
-            graphicsManager = new GraphicsDeviceManager(_parent)
+            _graphicsManager = new GraphicsDeviceManager(_parent)
             {
                 PreferredBackBufferWidth = Blockwidth*(_parent.Width + 6),
                 PreferredBackBufferHeight = Blockheight*_parent.Height,
@@ -40,26 +39,26 @@ namespace Rhetris
                 }
                 _palette[i].SetData(pixel, 0, 1024);
             }
-            nextFigure = new Point(_parent.Width + 3,3);
+            _nextFigure = new Point(_parent.Width + 3,3);
             graphics.Clear(Color.Black);
         }
 
-        public void Lock()
+        private void Lock()
         {
             _spriteBatch.Begin();
         }
 
-        public void Unlock()
+        private void Unlock()
         {
             _spriteBatch.End();
         }
 
-        public void Draw(int x, int y, uint blocktype)
+        private void Draw(int x, int y, uint blocktype)
         {
             _spriteBatch.Draw(_palette[blocktype],new Rectangle(x*Blockwidth,y*Blockheight,Blockwidth,Blockheight),Color.White);
         }
 
-        public void DrawField()
+        private void DrawField()
         {
             Lock();
             for (var x = 0; x < _parent.Width; ++x)
@@ -72,7 +71,7 @@ namespace Rhetris
             Unlock();
         }
 
-        public void DrawFigure(Point[] figure, uint blocktype)
+        private void DrawFigure(Point[] figure, uint blocktype)
         {
             Lock();
             foreach (var block in figure)
@@ -82,14 +81,25 @@ namespace Rhetris
             Unlock();
         }
 
-        public void DrawNextFigure(Point[] figure, uint blocktype)
+        private void DrawNextFigure(Point[] figure, uint blocktype)
         {
             Lock();
             foreach (var block in figure)
             {
-                Draw(block.X + nextFigure.X, block.Y + nextFigure.Y, blocktype);
+                Draw(block.X + _nextFigure.X, block.Y + _nextFigure.Y, blocktype);
             }
             Unlock();
+        }
+
+        public void DrawAll(Point[] clear, Point[] next, Point[] figure)
+        {
+            if (clear != null)
+            {
+                DrawNextFigure(clear, (uint)BlockType.Empty);
+            }
+            DrawNextFigure(next, (uint)BlockType.Alive);
+            DrawField();
+            DrawFigure(figure, (uint)BlockType.Alive);
         }
     }
 }

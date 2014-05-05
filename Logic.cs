@@ -22,7 +22,7 @@ namespace Rhetris
         Z = 6
     }
 
-    class GameLogic
+    class Logic
     {
         public Point[] Figure;
         public Point[] NextFigure;
@@ -31,7 +31,7 @@ namespace Rhetris
         public uint[,] Blocks;
         public Point Start;
 
-        public GameLogic(Rhetris main)
+        public Logic(Rhetris main)
         {
             _parent = main;
             Blocks = new uint[main.Width, main.Height];
@@ -154,15 +154,13 @@ namespace Rhetris
             CheckDeleted();
         }
 
-        public bool CanSwap()
-        {
-            var origin = Figure[0];
-            return NextFigure.All(block => Blocks[block.X + origin.X, block.Y + origin.Y] == (uint) BlockType.Empty);
-        }
-
         public Point[] SwapFigure()
         {
             var origin = Figure[0];
+            if (NextFigure.Any(block => Blocks[block.X + origin.X, block.Y + origin.Y] != (uint)BlockType.Empty))
+            {
+                return null;
+            }
             var newNextFigure = new Point[NextFigure.Length];
             var cleared = NextFigure;
             for (var i = 0; i < Figure.Length; i++)
@@ -187,11 +185,10 @@ namespace Rhetris
             for (var i = 0; i < Figure.Length; i++)
             {
                 temp[i] = new Point(origin.X - Figure[i].Y + origin.Y, Figure[i].X - origin.X + origin.Y);
-                if ((temp[i].X < 0) || (temp[i].Y < 0) || (Blocks[temp[i].X, temp[i].Y] != (uint) BlockType.Empty))
-                {
-                    rotated = false;
-                    break;
-                }
+                if ((temp[i].X >= 0) && (temp[i].Y >= 0) && (Blocks[temp[i].X, temp[i].Y] == (uint) BlockType.Empty))
+                    continue;
+                rotated = false;
+                break;
             }
             if (rotated)
             {
@@ -208,11 +205,10 @@ namespace Rhetris
             for (var i = 0; i < Figure.Length; i++)
             {
                 temp[i] = new Point(origin.X + Figure[i].Y - origin.Y, origin.Y - Figure[i].X + origin.X);
-                if ((temp[i].X < 0) || (temp[i].Y < 0) || (Blocks[temp[i].X, temp[i].Y] != (uint) BlockType.Empty))
-                {
-                    rotated = false;
-                    break;
-                }
+                if ((temp[i].X >= 0) && (temp[i].Y >= 0) && (Blocks[temp[i].X, temp[i].Y] == (uint) BlockType.Empty))
+                    continue;
+                rotated = false;
+                break;
             }
             if (rotated)
             {
@@ -229,22 +225,18 @@ namespace Rhetris
                 var full = true;
                 for (var j = 1; j < _parent.Width-1; j++)
                 {
-                    if (Blocks[j, i] == (uint) BlockType.Empty)
-                    {
-                        full = false;
-                        break;
-                    }
+                    if (Blocks[j, i] != (uint) BlockType.Empty) continue;
+                    full = false;
+                    break;
                 }
                 if (full)
                 {
                     shift++;
                 }
-                if (shift > 0)
+                if (shift <= 0) continue;
+                for (var j = 1; j < _parent.Width-1; j++)
                 {
-                    for (var j = 1; j < _parent.Width-1; j++)
-                    {
-                        Blocks[j, i] = Blocks[j, i-shift];
-                    }
+                    Blocks[j, i] = Blocks[j, i-shift];
                 }
             }
             for (var i = 0; i < shift; i++)
@@ -254,6 +246,47 @@ namespace Rhetris
                     Blocks[j, i] = (uint) BlockType.Empty;
                 }
             }
+        }
+
+        public Point[] Drop()
+        {
+            while (CanMove(new Point(0, 1)))
+            {
+                Move(new Point(0, 1));
+            }
+            var temp  = NextFigure;
+            KillFigure();
+            PlaceFigure();
+            return temp;
+        }
+
+        public void MoveLeft()
+        {
+            if (CanMove(new Point(-1, 0)))
+            {
+                Move(new Point(-1, 0));
+            }
+        }
+
+        public void MoveRight()
+        {
+            if (CanMove(new Point(1, 0)))
+            {
+                Move(new Point(1, 0));
+            }
+        }
+
+        public Point[] MoveDown()
+        {
+            if (CanMove(new Point(0,1)))
+            {
+                Move(new Point(0,1));
+                return null;
+            }
+            var temp = NextFigure;
+            KillFigure();
+            PlaceFigure();
+            return temp;
         }
     }
 }

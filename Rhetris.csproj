@@ -36,7 +36,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Drawer.cs" />
-    <Compile Include="GameLogic.cs" />
+    <Compile Include="Input.cs" />
+    <Compile Include="Logic.cs" />
     <Compile Include="Rhetris.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
