@@ -233,10 +233,15 @@ namespace Rhetris
                 {
                     shift++;
                 }
-                if (shift <= 0) continue;
-                for (var j = 1; j < _parent.Width-1; j++)
+                else
                 {
-                    Blocks[j, i] = Blocks[j, i-shift];
+                    if (shift > 0)
+                    {
+                        for (var j = 1; j < _parent.Width - 1; j++)
+                        {
+                            Blocks[j, i + shift] = Blocks[j, i];
+                        }
+                    }
                 }
             }
             for (var i = 0; i < shift; i++)
