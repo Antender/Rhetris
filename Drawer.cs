@@ -10,37 +10,39 @@ namespace Rhetris
         private const int Blockheight = 32;
         private readonly Rhetris _parent;
         private GraphicsDeviceManager _graphicsManager;
-        private GraphicsDevice graphics;
-        private readonly SpriteBatch _spriteBatch;
-        private readonly Texture2D[] _palette;
+        private SpriteBatch _spriteBatch;
+        private Texture2D[] _palette;
         private readonly uint[,] _gamefield;
         private Point _nextFigure;
         public Drawer(Rhetris main, uint[,] gamefield)
         {
             _parent = main;
             _gamefield = gamefield;
-            graphics = new GraphicsDevice();
             _graphicsManager = new GraphicsDeviceManager(_parent)
             {
                 PreferredBackBufferWidth = Blockwidth*(_parent.Width + 6),
                 PreferredBackBufferHeight = Blockheight*_parent.Height,
             };
+        }
+
+        public void LoadContent()
+        {
             _spriteBatch = new SpriteBatch(_parent.GraphicsDevice);
 
             _palette = new Texture2D[Palettewidth];
             var pixel = new uint[1024];
             for (var i = 0; i < Palettewidth; i++)
             {
-                var color = (uint) (i * (256 / Palettewidth) * 0x010000 + i * (256 / Palettewidth) * 0x0100 + i * (256 / Palettewidth) * 0x01 + 0xFF000000);
-                _palette[i] = new Texture2D(graphics, Blockwidth, Blockheight);
+                var color = (uint)(i * (256 / Palettewidth) * 0x010000 + i * (256 / Palettewidth) * 0x0100 + i * (256 / Palettewidth) * 0x01 + 0xFF000000);
+                _palette[i] = new Texture2D(_parent.GraphicsDevice, Blockwidth, Blockheight);
                 for (var j = 0; j < Blockwidth * Blockheight; j++)
                 {
                     pixel[j] = color;
                 }
                 _palette[i].SetData(pixel, 0, 1024);
             }
-            _nextFigure = new Point(_parent.Width + 3,3);
-            graphics.Clear(Color.Black);
+            _nextFigure = new Point(_parent.Width + 3, 3);
+            _parent.GraphicsDevice.Clear(Color.Black);
         }
 
         private void Lock()

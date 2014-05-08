@@ -38,6 +38,12 @@ namespace Rhetris
             _input.Add(Buttons.RightShoulder, Keys.X, () => _logic.RotateCounterClockwize());
         }
 
+        protected override void LoadContent()
+        {
+            _drawer.LoadContent();
+            base.LoadContent();
+        }
+
         protected override void Update(GameTime gameTime)
         {
             _input.Update();
