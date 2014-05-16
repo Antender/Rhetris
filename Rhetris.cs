@@ -32,13 +32,14 @@ namespace Rhetris
             _random = new Random();
             _audio = new Audio(this);
             _logic.NewGame();
-            _input.Add(Buttons.Back, Keys.Escape, Exit);
-            _input.Add(Buttons.B, Keys.Space, () => _clearNextFigure = _logic.SwapFigure());
-            _input.Add(Buttons.DPadDown, Keys.Down, () => {_clearNextFigure = _logic.Drop(); _previousMovement = 0;});
-            _input.Add(Buttons.DPadLeft, Keys.Left, () => _logic.MoveLeft());
-            _input.Add(Buttons.DPadRight, Keys.Right, () => _logic.MoveRight());
-            _input.Add(Buttons.LeftShoulder, Keys.Z, () => _logic.RotateClockwize());
-            _input.Add(Buttons.RightShoulder, Keys.X, () => _logic.RotateCounterClockwize());
+            _input.Add(Buttons.Back,          Keys.Escape, Exit);
+            _input.Add(Buttons.B,             Keys.Space,  () => _clearNextFigure = _logic.SwapFigure());
+            _input.Add(Buttons.DPadDown,      Keys.Down,   () => {_clearNextFigure = _logic.Drop(); _previousMovement = 0;});
+            _input.Add(Buttons.DPadLeft,      Keys.Left,   () => _logic.MoveLeft());
+            _input.Add(Buttons.DPadRight,     Keys.Right,  () => _logic.MoveRight());
+            _input.Add(Buttons.LeftShoulder,  Keys.Z,      () => _logic.RotateCounterClockwize());
+            _input.Add(Buttons.RightShoulder, Keys.X,      () => _logic.RotateClockwize());
+            _input.Add(Buttons.A,             Keys.Up,     () => _logic.RotateClockwize());
         }
 
         protected override void LoadContent()
