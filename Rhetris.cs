@@ -28,7 +28,7 @@ namespace Rhetris
             Content.RootDirectory = "Content";
             _logic = new Logic(this);
             _drawer = new Drawer(this, _logic.Blocks);
-            _input = new Input(7);
+            _input = new Input(8);
             _random = new Random();
             _audio = new Audio(this);
             _logic.NewGame();
