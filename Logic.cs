@@ -155,7 +155,7 @@ namespace Rhetris
 
         public bool CanMove(Point direction)
         {
-            return Figure.All(block => Blocks[block.X + direction.X, block.Y + direction.Y] == (uint) BlockType.Empty);
+            return Figure.All(block => (block.Y + direction.Y)>0 && Blocks[block.X + direction.X, block.Y + direction.Y] == (uint) BlockType.Empty);
         }
 
         public void Move(Point direction)
