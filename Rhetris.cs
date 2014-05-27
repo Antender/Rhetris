@@ -11,9 +11,9 @@ namespace Rhetris
         private readonly Random _random;
         private readonly Input _input;
         private readonly Audio _audio;
-        private Point[] _clearNextFigure;
+        private Point[] _oldNextFigure;
         private double _previousMovement;
-        private double _previousBeep;
+        private double _previousBeat;
         public int Width = 12;
         public int Height = 23;
         public int FigNum = 7;
@@ -33,8 +33,8 @@ namespace Rhetris
             _audio = new Audio(this);
             _logic.NewGame();
             _input.Add(Buttons.Back,          Keys.Escape, Exit);
-            _input.Add(Buttons.B,             Keys.Space,  () => _clearNextFigure = _logic.SwapFigure());
-            _input.Add(Buttons.DPadDown,      Keys.Down,   () => {_clearNextFigure = _logic.Drop(); _previousMovement = 0;});
+            _input.Add(Buttons.B,             Keys.Space,  () => _oldNextFigure = _logic.SwapFigure());
+            _input.Add(Buttons.DPadDown,      Keys.Down,   () => {_oldNextFigure = _logic.Drop(_previousBeat); _previousMovement = 0;});
             _input.Add(Buttons.DPadLeft,      Keys.Left,   () => _logic.MoveLeft());
             _input.Add(Buttons.DPadRight,     Keys.Right,  () => _logic.MoveRight());
             _input.Add(Buttons.LeftShoulder,  Keys.Z,      () => _logic.RotateCounterClockwize());
@@ -52,22 +52,22 @@ namespace Rhetris
         {
             _input.Update();
             _previousMovement += gameTime.ElapsedGameTime.TotalMilliseconds;
-            _previousBeep += gameTime.ElapsedGameTime.TotalMilliseconds;
+            _previousBeat += gameTime.ElapsedGameTime.TotalMilliseconds;
             if (_previousMovement > (2000.0/Speed))
             {
-                _clearNextFigure = _logic.MoveDown();
+                _oldNextFigure = _logic.MoveDown();
                 _previousMovement = 0;
             }
-            if (_previousBeep > 1000)
+            if (_previousBeat > 1000)
             {
-                _audio.playBeep();
-                _previousBeep = 0;
+                _audio.playBeat();
+                _previousBeat = 0;
             }
             base.Update(gameTime);
         }
         protected override void Draw(GameTime gameTime)
         {
-            _drawer.DrawAll(_clearNextFigure, _logic.NextFigure, _logic.Figure);
+            _drawer.DrawAll(_oldNextFigure, _logic.NextFigure, _logic.Figure);
             base.Draw(gameTime);
         }
     }

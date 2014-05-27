@@ -5,7 +5,7 @@ namespace Rhetris
 {
     class Audio
     {
-        Cue[] cues = new Cue[11];
+        Cue beat;
         AudioEngine audioEngine;
         WaveBank waveBank;
         SoundBank soundBank;
@@ -13,17 +13,14 @@ namespace Rhetris
         public Audio(Rhetris parent)
         {
             _parent = parent;
-            audioEngine = new AudioEngine("Content\\Beeps.xgs");
-            waveBank = new WaveBank(audioEngine,"Content\\Beeps.xwb");
-            soundBank = new SoundBank(audioEngine,"Content\\Beeps.xsb");
-            for (var i=0 ; i<=10 ; i++)
-            {
-                cues[i] = soundBank.GetCue(i.ToString());
-            }
+            audioEngine = new AudioEngine("Content\\Sound.xgs");
+            waveBank = new WaveBank(audioEngine,"Content\\Sound.xwb");
+            soundBank = new SoundBank(audioEngine,"Content\\Sound.xsb");
+            beat = soundBank.GetCue("beep");
         }
-        public void playBeep()
+        public void playBeat()
         {
-            cues[_parent.Rnd(11)].Play();
+            beat.Play();
         }
     }
 }

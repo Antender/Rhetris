@@ -1,8 +1,29 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Microsoft.Xna.Framework;
 
 namespace Rhetris
 {
+    struct Score
+    {
+        bool late;
+        int points;
+
+        public Score(double prevBeat)
+        {
+            if (prevBeat > 500)
+            {
+                late = false;
+            }
+            else
+            {
+                late = true;
+            }
+
+            points = 500 - Math.Abs(500 - (int)prevBeat);
+        }
+    }
+
     public enum BlockType : uint
     {
         Empty = 0,
@@ -30,7 +51,7 @@ namespace Rhetris
         private readonly Rhetris _parent;
         public uint[,] Blocks;
         public Point Start;
-
+        Score score;
         public Logic(Rhetris main)
         {
             _parent = main;
@@ -253,7 +274,7 @@ namespace Rhetris
             }
         }
 
-        public Point[] Drop()
+        public Point[] Drop(double prevBeat)
         {
             while (CanMove(new Point(0, 1)))
             {
@@ -262,6 +283,7 @@ namespace Rhetris
             var temp  = NextFigure;
             KillFigure();
             PlaceFigure();
+            score = new Score(prevBeat); //Scoring
             return temp;
         }
 
@@ -283,15 +305,18 @@ namespace Rhetris
 
         public Point[] MoveDown()
         {
-            if (CanMove(new Point(0,1)))
+            if (CanMove(new Point(0, 1))) //Move tetromino down. No NextFigure redrawing.
             {
-                Move(new Point(0,1));
+                Move(new Point(0, 1));
                 return null;
             }
-            var temp = NextFigure;
-            KillFigure();
-            PlaceFigure();
-            return temp;
+            else //Tetromino dies. NextFigure is to be redrawn.
+            {
+                var temp = NextFigure;
+                KillFigure();
+                PlaceFigure();
+                return temp;
+            }
         }
     }
 }
