@@ -1,5 +1,7 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System.IO;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using BmFont;
 
 namespace Rhetris
 {
@@ -14,6 +16,7 @@ namespace Rhetris
         private Texture2D[] _palette;
         private readonly uint[,] _gamefield;
         private Point _nextFigure;
+        private FontRenderer fontrenderer;
         public Drawer(Rhetris main, uint[,] gamefield)
         {
             _parent = main;
@@ -23,6 +26,7 @@ namespace Rhetris
                 PreferredBackBufferWidth = Blockwidth*(_parent.Width + 6),
                 PreferredBackBufferHeight = Blockheight*_parent.Height,
             };
+            
         }
 
         public void LoadContent()
@@ -42,6 +46,7 @@ namespace Rhetris
                 _palette[i].SetData(pixel, 0, 1024);
             }
             _nextFigure = new Point(_parent.Width + 3, 3);
+            fontrenderer = new FontRenderer(Path.Combine("Content","Latin.fnt"),Path.Combine("Content","Latin_0.png"),_parent.GraphicsDevice);
             _parent.GraphicsDevice.Clear(Color.Black);
         }
 
@@ -93,7 +98,7 @@ namespace Rhetris
             Unlock();
         }
 
-        public void DrawAll(Point[] clear, Point[] next, Point[] figure)
+        public void DrawAll(Point[] clear, Point[] next, Point[] figure, Score score)
         {
             if (clear != null)
             {
@@ -102,6 +107,19 @@ namespace Rhetris
             DrawNextFigure(next, (uint)BlockType.Alive);
             DrawField();
             DrawFigure(figure, (uint)BlockType.Alive);
+            DrawScore(score);
+        }
+
+        public void DrawScore(Score score)
+        {
+            Lock();
+            for (var i = 14; i < 17; i++)
+            {
+                Draw(i,6,(uint)BlockType.Empty);
+            }
+            Unlock();
+            fontrenderer.DrawText(_spriteBatch, 14*Blockwidth, 6*Blockheight, score.points.ToString(),
+                score.late ? Color.Blue : Color.Red);
         }
     }
 }

@@ -6,8 +6,8 @@ namespace Rhetris
 {
     struct Score
     {
-        bool late;
-        int points;
+        public bool late;
+        public int points;
 
         public Score(double prevBeat)
         {
@@ -20,7 +20,7 @@ namespace Rhetris
                 late = true;
             }
 
-            points = 500 - Math.Abs(500 - (int)prevBeat);
+            points = 500 - Math.Abs((int)prevBeat - 500);
         }
     }
 
@@ -51,7 +51,7 @@ namespace Rhetris
         private readonly Rhetris _parent;
         public uint[,] Blocks;
         public Point Start;
-        Score score;
+        public Score score;
         public Logic(Rhetris main)
         {
             _parent = main;
@@ -155,7 +155,7 @@ namespace Rhetris
 
         public bool CanMove(Point direction)
         {
-            return Figure.All(block => (block.Y + direction.Y)>0 && Blocks[block.X + direction.X, block.Y + direction.Y] == (uint) BlockType.Empty);
+            return Figure.All(block => (block.Y + direction.Y)<0 || Blocks[block.X + direction.X, block.Y + direction.Y] == (uint) BlockType.Empty);
         }
 
         public void Move(Point direction)

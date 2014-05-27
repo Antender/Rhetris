@@ -36,6 +36,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Audio.cs" />
+    <Compile Include="bmfont.cs" />
     <Compile Include="Drawer.cs" />
     <Compile Include="Input.cs" />
     <Compile Include="Logic.cs" />

@@ -67,7 +67,7 @@ namespace Rhetris
         }
         protected override void Draw(GameTime gameTime)
         {
-            _drawer.DrawAll(_oldNextFigure, _logic.NextFigure, _logic.Figure);
+            _drawer.DrawAll(_oldNextFigure, _logic.NextFigure, _logic.Figure,_logic.score);
             base.Draw(gameTime);
         }
     }
