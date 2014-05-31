@@ -265,13 +265,6 @@ namespace Rhetris
                     }
                 }
             }
-/*            for (var i = 0; i < shift; i++)
-            {
-                for (var j = 1; j < _parent.Width-1; j++)
-                {
-                    Blocks[j, i] = (uint) BlockType.Empty;
-                }
-            }*/
         }
 
         public Point[] Drop(double prevBeat)
