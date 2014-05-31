@@ -56,7 +56,7 @@ namespace Rhetris
         {
             _parent = main;
             Blocks = new uint[main.Width, main.Height];
-            Start = new Point(_parent.Width/2, 0);
+            Start = new Point(_parent.Width/2, 2);
             CreateFigures();
         }
 

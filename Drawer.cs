@@ -24,7 +24,7 @@ namespace Rhetris
             _graphicsManager = new GraphicsDeviceManager(_parent)
             {
                 PreferredBackBufferWidth = Blockwidth*(_parent.Width + 6),
-                PreferredBackBufferHeight = Blockheight*_parent.Height,
+                PreferredBackBufferHeight = Blockheight*(_parent.Height-2),
             };
             
         }
@@ -62,7 +62,7 @@ namespace Rhetris
 
         private void Draw(int x, int y, uint blocktype)
         {
-            _spriteBatch.Draw(_palette[blocktype],new Rectangle(x*Blockwidth,y*Blockheight,Blockwidth,Blockheight),Color.White);
+            _spriteBatch.Draw(_palette[blocktype],new Rectangle(x*Blockwidth,(y-2)*Blockheight,Blockwidth,Blockheight),Color.White);
         }
 
         private void DrawField()
@@ -70,7 +70,7 @@ namespace Rhetris
             Lock();
             for (var x = 0; x < _parent.Width; ++x)
             {
-                for (var y = 0; y < _parent.Height; ++y)
+                for (var y = 2; y < _parent.Height; ++y)
                 {
                     Draw(x, y, _gamefield[x, y]);
                 }
