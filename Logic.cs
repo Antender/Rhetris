@@ -155,7 +155,7 @@ namespace Rhetris
 
         public bool CanMove(Point direction)
         {
-            return Figure.All(block => (block.Y + direction.Y)<0 || Blocks[block.X + direction.X, block.Y + direction.Y] == (uint) BlockType.Empty);
+            return Figure.All(block => Blocks[block.X + direction.X, block.Y + direction.Y] == (uint) BlockType.Empty);
         }
 
         public void Move(Point direction)
@@ -241,7 +241,7 @@ namespace Rhetris
         public void CheckDeleted()
         {
             var shift = 0;
-            for (var i = _parent.Height-2; i >= shift; i--)
+            for (var i = _parent.Height-2; i >= 0; i--)
             {
                 var full = true;
                 for (var j = 1; j < _parent.Width-1; j++)
@@ -265,13 +265,13 @@ namespace Rhetris
                     }
                 }
             }
-            for (var i = 0; i < shift; i++)
+/*            for (var i = 0; i < shift; i++)
             {
                 for (var j = 1; j < _parent.Width-1; j++)
                 {
                     Blocks[j, i] = (uint) BlockType.Empty;
                 }
-            }
+            }*/
         }
 
         public Point[] Drop(double prevBeat)
