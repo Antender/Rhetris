@@ -1,26 +1,25 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Media;
+using System.Runtime.InteropServices;
 using Microsoft.Xna.Framework.Audio;
 
 namespace Rhetris
 {
     class Audio
     {
-        Cue beat;
-        AudioEngine audioEngine;
-        WaveBank waveBank;
-        SoundBank soundBank;
         Rhetris _parent;
+
+        private SoundPlayer soundPlayer;
         public Audio(Rhetris parent)
         {
             _parent = parent;
-            audioEngine = new AudioEngine("Content\\Sound.xgs");
-            waveBank = new WaveBank(audioEngine,"Content\\Sound.xwb");
-            soundBank = new SoundBank(audioEngine,"Content\\Sound.xsb");
-            beat = soundBank.GetCue("beep");
+            soundPlayer = new SoundPlayer(new FileStream("Content\\Audio\\Beep.wav", FileMode.Open));
         }
         public void playBeat()
         {
-            beat.Play();
+            soundPlayer.Play();
         }
     }
 }

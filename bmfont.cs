@@ -370,7 +370,7 @@ namespace BmFont
 
             foreach (var fontCharacter in _fontFile.Chars)
             {
-                char c = (char)fontCharacter.ID;
+                var c = (char)fontCharacter.ID;
                 _characterMap.Add(c, fontCharacter);
             }
 	    }

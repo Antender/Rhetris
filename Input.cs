@@ -64,5 +64,10 @@ namespace Rhetris
             oldGamepadState = currentGamepadState;
             oldKeyboardState = currentKeyboardState;
         }
+
+        public void Clear()
+        {
+            _freeSlot = 0;
+        }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -8,17 +9,25 @@ namespace Rhetris
 {
     class Drawer
     {
-        private const int Palettewidth = 8;
+        private const int Palettewidth = 16;
+        private const int BasePalettewidth = 7;
         private const int Blockwidth = 32;
         private const int Blockheight = 32;
         private readonly Rhetris _parent;
         private GraphicsDeviceManager _graphicsManager;
         private SpriteBatch _spriteBatch;
         private Texture2D[] _palette;
+        private Texture2D[][] _palettes; 
         private Texture2D _background;
         private readonly uint[,] _gamefield;
         private Point _nextFigure;
         private FontRenderer _fontrenderer;
+        private Point GOBlock;
+        private uint GOBlockColor;
+        private const int GameOverSpeed = 5;
+        public int basepalette;
+        public int currentpalette;
+        private Texture2D blacktexture;
         public Drawer(Rhetris main, uint[,] gamefield)
         {
             _parent = main;
@@ -34,18 +43,35 @@ namespace Rhetris
         public void LoadContent()
         {
             _spriteBatch = new SpriteBatch(_parent.GraphicsDevice);
-
-            _palette = new Texture2D[Palettewidth];
-            var palettedata = new uint[1024];
-            for (var i = 0; i < Palettewidth; i++)
+            _palettes = new Texture2D[BasePalettewidth][];
+            var palettedata = new uint[Blockwidth*Blockheight];
+            blacktexture = new Texture2D(_parent.GraphicsDevice,Blockwidth, Blockheight);
+            for (var j = 0; j < Blockwidth * Blockheight; j++)
             {
-                var color = (uint)(i * (256 / Palettewidth) * 0x010000 + i * (256 / Palettewidth) * 0x0100 + i * (256 / Palettewidth) * 0x01 + 0xFF000000);
-                _palette[i] = new Texture2D(_parent.GraphicsDevice, Blockwidth, Blockheight);
-                for (var j = 0; j < Blockwidth * Blockheight; j++)
+                palettedata[j] = Color.Black.PackedValue;
+            }
+            blacktexture.SetData(palettedata);
+            for (var b = 0; b < BasePalettewidth; b++)
+            {
+                _palette = new Texture2D[Palettewidth];
+                uint basecolor = (uint)(
+    ((((b + 1) & 0x00000001) == 0) ? 0 : 0x000000FF) +
+    ((((b + 1) & 0x00000002) == 0) ? 0 : 0x00FF0000) +
+    ((((b + 1) & 0x00000004) == 0) ? 0 : 0x0000FF00)
+    ); 
+                for (var i = 0; i < Palettewidth; i++)
                 {
-                    palettedata[j] = color;
+                    var color =
+                        (uint)
+                            ((basecolor/Palettewidth*i)+0xFF000000);
+                    _palette[i] = new Texture2D(_parent.GraphicsDevice, Blockwidth, Blockheight);
+                    for (var j = 0; j < Blockwidth * Blockheight; j++)
+                    {
+                        palettedata[j] = color;
+                    }
+                    _palette[i].SetData(palettedata);
                 }
-                _palette[i].SetData(palettedata);
+                _palettes[b] = _palette;            
             }
             var backgrounddata = new uint[(_parent.Height-2)*Blockheight*_parent.Width*Blockwidth];
             const uint darkbackground = 0xFF000000;
@@ -78,7 +104,7 @@ namespace Rhetris
             }
             _background = new Texture2D(_parent.GraphicsDevice,_parent.Width*Blockwidth,(_parent.Height-2)*Blockheight);
             _background.SetData(backgrounddata);
-            _nextFigure = new Point(_parent.Width + 3, 3);
+            _nextFigure = new Point(_parent.Width + 2, 3);
             _fontrenderer = new FontRenderer(Path.Combine("Content","Latin.fnt"),Path.Combine("Content","Latin_0.png"),_parent.GraphicsDevice);
             _parent.GraphicsDevice.Clear(Color.Black);
         }
@@ -95,7 +121,19 @@ namespace Rhetris
 
         private void Draw(int x, int y, uint blocktype)
         {
-            _spriteBatch.Draw(_palette[blocktype],new Vector2(x*Blockwidth,y*Blockheight));
+            if (blocktype == (uint)BlockType.Empty)
+            {
+                _spriteBatch.Draw(blacktexture, new Vector2(x * Blockwidth, y * Blockheight));
+            }
+            else
+            {
+                _spriteBatch.Draw(_palettes[currentpalette][blocktype + basepalette], new Vector2(x * Blockwidth, y * Blockheight));
+            }           
+        }
+
+        public void DrawByIndex(Point block, uint blocktype)
+        {
+            _spriteBatch.Draw(_palettes[blocktype/Palettewidth][blocktype%Palettewidth], new Vector2(block.X * Blockwidth, block.Y * Blockheight));   
         }
 
         private void DrawField()
@@ -152,11 +190,109 @@ namespace Rhetris
             Lock();
             for (var i = 14; i < 17; i++)
             {
-                Draw(i,6,(uint)BlockType.Empty);
+                Draw(i,7,(uint)BlockType.Empty);
             }
             Unlock();
-            _fontrenderer.DrawText(_spriteBatch, 14*Blockwidth, 6*Blockheight, score.points.ToString(),
+            _fontrenderer.DrawText(_spriteBatch, (_parent.Width + 1)*Blockwidth, 7*Blockheight, score.points.ToString() + " ms",
                 score.late ? Color.Blue : Color.Red);
+        }
+
+        public void SetGameOver()
+        {
+            GOBlock = new Point(0,0);
+            GOBlockColor = 0;
+        }
+
+        public void DrawGameOver(int color)
+        {
+            GOBlockColor = (uint)color;
+            for (int gocounter = 0; gocounter < GameOverSpeed; gocounter++)
+            {
+                GOBlock = new Point(GOBlock.X+1,GOBlock.Y);
+                if (GOBlock.X == _parent.Width)
+                {
+                    GOBlock = new Point(0,GOBlock.Y + 1);
+                }
+                if (GOBlock.Y == _parent.Height)
+                {
+                    _parent.GameOverLabel();
+                    break;
+                }
+                Lock();
+                DrawByIndex(GOBlock,GOBlockColor);
+                Unlock();
+            }
+        }
+
+        public void DrawGameOverLabel()
+        {
+            _fontrenderer.DrawText(_spriteBatch, (_parent.Width + 1) * Blockwidth, 10 * Blockheight, "The End",
+    Color.White);
+        }
+
+        public void DrawWinLabel()
+        {
+            _fontrenderer.DrawText(_spriteBatch, (_parent.Width + 1) * Blockwidth, 10 * Blockheight, "You Won!",
+    Color.White);
+        }
+
+        public int GetAllColors()
+        {
+            return Palettewidth*BasePalettewidth;
+        }
+
+        public void NextPalette()
+        {
+            basepalette++;
+            if ((basepalette + 3) == Palettewidth)
+            {
+                ResetPalette();
+                currentpalette++;
+                if (currentpalette == 1)
+                {
+                    _parent.Win();
+                }
+                else
+                {
+                    _palette = _palettes[currentpalette];
+                }
+            }
+        }
+
+        public void ResetPalette()
+        {
+            if (_palette != null)
+            {
+                basepalette = 1;
+            }
+        }
+
+        public void NewGame()
+        {
+            currentpalette = 0;
+            basepalette = 1;
+        }
+
+        public void ClearForNewgame()
+        {
+            Lock();
+            for (int i = 0; i < 7; i++)
+            {
+                Draw(_parent.Width + 1 + i, 10, (uint) BlockType.Empty);
+            }
+            Unlock();
+        }
+
+        public void DrawLabels()
+        {
+            _fontrenderer.DrawText(_spriteBatch, (_parent.Width + 1) * Blockwidth, 0, "Next",
+                Color.White);
+            _fontrenderer.DrawText(_spriteBatch, (_parent.Width + 1) * Blockwidth, 1 * Blockheight, "Figure",
+    Color.White);
+            _fontrenderer.DrawText(_spriteBatch, (_parent.Width + 1) * Blockwidth, 5 * Blockheight, "Your",
+    Color.White);
+            _fontrenderer.DrawText(_spriteBatch, (_parent.Width + 1) * Blockwidth, 6 * Blockheight, "Latency",
+    Color.White);
         }
     }
 }

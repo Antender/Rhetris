@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Linq;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Net;
 
 namespace Rhetris
 {
+
     struct Score
     {
         public bool late;
@@ -52,6 +54,7 @@ namespace Rhetris
         public uint[,] Blocks;
         public Point Start;
         public Score score;
+        
         public Logic(Rhetris main)
         {
             _parent = main;
@@ -125,12 +128,17 @@ namespace Rhetris
             for (var i = 0; i < NextFigure.Length; i++)
             {
                 Figure[i] = new Point(NextFigure[i].X + Start.X, NextFigure[i].Y + Start.Y);
+                if (GetBlock(Figure[i]) != (uint)BlockType.Empty)
+                {
+                    _parent.GameOver();
+                }
             }
             SpawnFigure();
         }
 
         public void NewGame()
         {
+            _parent.state = GameState.Playing;
             for (var i = 0; i < _parent.Height; i++)
             {
                 Blocks[0, i] = (uint) BlockType.Wall;
@@ -138,7 +146,7 @@ namespace Rhetris
             }
             for (var i = 1; i < _parent.Width - 1; i++)
             {
-                for (var j = 0; j < _parent.Width - 1; j++)
+                for (var j = 0; j < _parent.Height - 1; j++)
                 {
                     Blocks[i, j] = (uint) BlockType.Empty;
                 }
@@ -277,6 +285,7 @@ namespace Rhetris
             KillFigure();
             PlaceFigure();
             score = new Score(prevBeat); //Scoring
+            _parent.CheckScore();
             return temp;
         }
 
