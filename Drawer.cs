@@ -28,6 +28,7 @@ namespace Rhetris
         public int basepalette;
         public int currentpalette;
         private Texture2D blacktexture;
+        private double limit;
         public Drawer(Rhetris main, uint[,] gamefield)
         {
             _parent = main;
@@ -188,7 +189,7 @@ namespace Rhetris
         public void DrawScore(Score score)
         {
             Lock();
-            for (var i = 14; i < 17; i++)
+            for (var i = 14; i < 19; i++)
             {
                 Draw(i,7,(uint)BlockType.Empty);
             }
@@ -248,13 +249,14 @@ namespace Rhetris
             {
                 ResetPalette();
                 currentpalette++;
-                if (currentpalette == 1)
+                if (currentpalette == BasePalettewidth)
                 {
                     _parent.Win();
                 }
                 else
                 {
                     _palette = _palettes[currentpalette];
+                    _parent.Speed = 3.0 / ((double)currentpalette + 3.0) ;
                 }
             }
         }
@@ -293,6 +295,25 @@ namespace Rhetris
     Color.White);
             _fontrenderer.DrawText(_spriteBatch, (_parent.Width + 1) * Blockwidth, 6 * Blockheight, "Latency",
     Color.White);
+            _fontrenderer.DrawText(_spriteBatch, (_parent.Width + 1) * Blockwidth, 8 * Blockheight, "from",
+Color.White);
+        }
+
+        public void DrawLimit()
+        {
+            Lock();
+            for (var i = 14; i < 19; i++)
+            {
+                Draw(i, 9, (uint)BlockType.Empty);
+            }
+            Unlock();
+            _fontrenderer.DrawText(_spriteBatch, (_parent.Width + 1) * Blockwidth, 9 * Blockheight, limit.ToString() + " ms",
+                Color.LightGray);
+        }
+
+        public void SetLimit(double l)
+        {
+            limit = l;
         }
     }
 }

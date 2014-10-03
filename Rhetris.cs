@@ -26,7 +26,8 @@ namespace Rhetris
         public int Width = 12;
         public int Height = 23;
         public int FigNum = 7;
-        private const int Speed = 1;
+        public double Speed = 1.0;
+        public float nextBeat;
         public GameState state;
 
         public int Rnd(int max)
@@ -54,21 +55,24 @@ namespace Rhetris
 
         protected override void Update(GameTime gameTime)
         {
+ 
             _input.Update();
             switch (state)
             {
                 case GameState.Playing:                   
                     _previousMovement += gameTime.ElapsedGameTime.TotalMilliseconds;
                     _previousBeat += gameTime.ElapsedGameTime.TotalMilliseconds;
-                    if (_previousMovement > (2000.0/Speed))
+                    _logic.SetTime(_previousBeat);
+                    if (_previousMovement > (2000.0 * Speed))
                     {
-                        _oldNextFigure = _logic.MoveDown();
-
+                        _oldNextFigure = _logic.MoveDown();                        
                         _previousMovement = 0;
-                    }
-                    if (_previousBeat > 1000)
-                    {
+                        
                         _audio.playBeat();
+                    }
+                    if (_previousBeat > nextBeat)
+                    {
+                        nextBeat = _random.Next(1000, 3000);
                         _previousBeat = 0;
                     }
 
@@ -89,6 +93,7 @@ namespace Rhetris
                 case GameState.Playing:
                     _drawer.DrawAll(_oldNextFigure, _logic.NextFigure, _logic.Figure, _logic.score); 
                     _drawer.DrawLabels();
+                    _drawer.DrawLimit();
                     break;
                 case GameState.GameOver:
                     _drawer.DrawGameOver(_random.Next(_drawer.GetAllColors()));
@@ -136,6 +141,7 @@ namespace Rhetris
             _input.Add(Buttons.RightShoulder, Keys.X, () => _logic.RotateClockwize());
             _input.Add(Buttons.A, Keys.Up, () => _logic.RotateClockwize());
             _drawer.NewGame();
+            nextBeat = 500;
             state = GameState.NewGame;
         }
 
@@ -155,7 +161,7 @@ namespace Rhetris
 
         public void CheckScore()
         {
-            if (_logic.score.points < 300)
+            if (Math.Abs(_logic.score.points) < (nextBeat * 0.35))
             {
                 _drawer.NextPalette();      
             }
@@ -163,6 +169,9 @@ namespace Rhetris
             {
                 _drawer.ResetPalette();
             }
+            _drawer.SetLimit((int)nextBeat * 0.35);
+            nextBeat = _random.Next(1000, 3000);
+            _previousBeat = 0;
         }
     }
 }

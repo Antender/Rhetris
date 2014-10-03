@@ -11,18 +11,10 @@ namespace Rhetris
         public bool late;
         public int points;
 
-        public Score(double prevBeat)
+        public Score(double delta, bool l)
         {
-            if (prevBeat > 500)
-            {
-                late = false;
-            }
-            else
-            {
-                late = true;
-            }
-
-            points = 500 - Math.Abs((int)prevBeat - 500);
+            points = (int) delta;
+            late = l;
         }
     }
 
@@ -54,6 +46,7 @@ namespace Rhetris
         public uint[,] Blocks;
         public Point Start;
         public Score score;
+        public double time;
         
         public Logic(Rhetris main)
         {
@@ -180,6 +173,8 @@ namespace Rhetris
             {
                 Blocks[block.X, block.Y] = (uint) BlockType.Dead;
             }
+            ComputeScore(_parent.nextBeat, time);
+            _parent.CheckScore();
             CheckDeleted();
         }
 
@@ -284,8 +279,6 @@ namespace Rhetris
             var temp  = NextFigure;
             KillFigure();
             PlaceFigure();
-            score = new Score(prevBeat); //Scoring
-            _parent.CheckScore();
             return temp;
         }
 
@@ -319,6 +312,24 @@ namespace Rhetris
                 PlaceFigure();
                 return temp;
             }
+        }
+
+        public void ComputeScore(float nextBeat, double currentDelta)
+        {
+            float dfuture = (float) (Math.Abs(nextBeat - currentDelta));
+            if (currentDelta > dfuture)
+            {
+                score = new Score(Math.Abs(dfuture),false);
+            }
+            else
+            {
+                score = new Score(Math.Abs(currentDelta),true);
+            }
+        }
+
+        public void SetTime(double t)
+        {
+            time = t;
         }
     }
 }
