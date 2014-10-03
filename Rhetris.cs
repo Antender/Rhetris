@@ -66,12 +66,11 @@ namespace Rhetris
                     if (_previousMovement > (2000.0 * Speed))
                     {
                         _oldNextFigure = _logic.MoveDown();                        
-                        _previousMovement = 0;
-                        
-                        _audio.playBeat();
+                        _previousMovement = 0;    
                     }
                     if (_previousBeat > nextBeat)
                     {
+                        _audio.playBeat();
                         nextBeat = _random.Next(1000, 3000);
                         _previousBeat = 0;
                     }
@@ -170,8 +169,6 @@ namespace Rhetris
                 _drawer.ResetPalette();
             }
             _drawer.SetLimit((int)nextBeat * 0.35);
-            nextBeat = _random.Next(1000, 3000);
-            _previousBeat = 0;
         }
     }
 }
