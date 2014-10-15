@@ -10,16 +10,31 @@ namespace Rhetris
     class Audio
     {
         Rhetris _parent;
-        private SoundPlayer soundPlayer;
-        public Audio(Rhetris parent)
+		private SoundPlayer beatPlayer;
+		private SoundPlayer sub_beatPlayer;
+		private bool even;
+
+		public Audio(Rhetris parent)
         {
             _parent = parent;
-            soundPlayer = new SoundPlayer(new FileStream("Content\\Audio\\Beep.wav", FileMode.Open));
+            beatPlayer = new SoundPlayer(new FileStream("Content\\Audio\\beat.wav", FileMode.Open));
+			sub_beatPlayer = new SoundPlayer(new FileStream("Content\\Audio\\sub_beat.wav", FileMode.Open));
+
         }
 
         public void playBeat()
         {
-            soundPlayer.Play();
+			if(even == false)
+			{
+				beatPlayer.Play();
+				even = true;
+			}
+			else
+			{
+				sub_beatPlayer.Play();
+				even = false;
+			}
+
         }
     }
 }

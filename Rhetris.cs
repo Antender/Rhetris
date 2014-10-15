@@ -72,7 +72,7 @@ namespace Rhetris
                     if (_previousBeat > nextBeat)
                     {
                         _audio.playBeat();
-                        nextBeat = _random.Next(1000, 3000);
+                        nextBeat = 500;
                         _previousBeat = 0;
                     }
 
