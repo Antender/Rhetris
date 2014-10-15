@@ -1,8 +1,11 @@
-﻿using System;
+#region Using Statements
+using System;
+using System.Collections.Generic;
+using System.Linq;
+#endregion
 
 namespace Rhetris
 {
-#if WINDOWS || LINUX
     /// <summary>
     /// The main class.
     /// </summary>
@@ -18,5 +21,4 @@ namespace Rhetris
                 game.Run();
         }
     }
-#endif
 }
