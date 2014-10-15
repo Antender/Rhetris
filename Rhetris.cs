@@ -37,7 +37,6 @@ namespace Rhetris
         
         public Rhetris()
         {
-            IsMouseVisible = true;
             Content.RootDirectory = "Content";
             _logic = new Logic(this);
             _drawer = new Drawer(this, _logic.Blocks);
@@ -120,7 +119,6 @@ namespace Rhetris
             _input.Add(Buttons.LeftShoulder, Keys.Z, () => {});
             _input.Add(Buttons.RightShoulder, Keys.X, () => {});
             _input.Add(Buttons.A, Keys.Up, () => {});
-            _input.SetTouchActions(() => { }, () => { }, () => { }, () => { });
             _drawer.SetGameOver();
         }
 
@@ -141,7 +139,6 @@ namespace Rhetris
             _input.Add(Buttons.LeftShoulder, Keys.Z, () => _logic.RotateCounterClockwize());
             _input.Add(Buttons.RightShoulder, Keys.X, () => _logic.RotateClockwize());
             _input.Add(Buttons.A, Keys.Up, () => _logic.RotateClockwize());
-            _input.SetTouchActions(() => _logic.MoveLeft(), () => _logic.MoveRight(), () => _logic.RotateClockwize(), () => { _oldNextFigure = _logic.Drop(_previousBeat); _previousMovement = 0; });
             _drawer.NewGame();
             nextBeat = 500;
             state = GameState.NewGame;
@@ -159,7 +156,6 @@ namespace Rhetris
             _input.Add(Buttons.LeftShoulder, Keys.Z, () => { });
             _input.Add(Buttons.RightShoulder, Keys.X, () => { });
             _input.Add(Buttons.A, Keys.Up, () => { });
-            _input.SetTouchActions(() => { }, () => { }, () => { }, () => { });
         }
 
         public void CheckScore()
