@@ -15,26 +15,21 @@ namespace Rhetris
 
     public class Rhetris : Game
     {
+        private readonly Audio _audio;
         private readonly Drawer _drawer;
+        private readonly Input _input;
         private readonly Logic _logic;
         private readonly Random _random;
-        private readonly Input _input;
-        private readonly Audio _audio;
-        private Point[] _oldNextFigure;
-        private double _previousMovement;
-        private double _previousBeat;
-        public int Width = 12;
-        public int Height = 23;
         public int FigNum = 7;
+        public int Height = 23;
         public double Speed = 1.0;
-        public float nextBeat;
-        public GameState state;
+        public int Width = 12;
+        private Point[] _oldNextFigure;
+        private double _previousBeat;
+        private double _previousMovement;
+        public float NextBeat;
+        public GameState State;
 
-        public int Rnd(int max)
-        {
-            return _random.Next(max);
-        }
-        
         public Rhetris()
         {
             IsMouseVisible = true;
@@ -47,6 +42,11 @@ namespace Rhetris
             NewGame();
         }
 
+        public int Rnd(int max)
+        {
+            return _random.Next(max);
+        }
+
         protected override void LoadContent()
         {
             _drawer.LoadContent();
@@ -56,23 +56,22 @@ namespace Rhetris
 
         protected override void Update(GameTime gameTime)
         {
- 
             _input.Update();
-            switch (state)
+            switch (State)
             {
-                case GameState.Playing:                   
+                case GameState.Playing:
                     _previousMovement += gameTime.ElapsedGameTime.TotalMilliseconds;
                     _previousBeat += gameTime.ElapsedGameTime.TotalMilliseconds;
                     _logic.SetTime(_previousBeat);
-                    if (_previousMovement > (2000.0 * Speed))
+                    if (_previousMovement > (2000.0*Speed))
                     {
-                        _oldNextFigure = _logic.MoveDown();                        
-                        _previousMovement = 0;    
+                        _oldNextFigure = _logic.MoveDown();
+                        _previousMovement = 0;
                     }
-                    if (_previousBeat > nextBeat)
+                    if (_previousBeat > NextBeat)
                     {
-                        _audio.playBeat();
-                        nextBeat = 500;
+                        _audio.PlayBeat();
+                        NextBeat = 500;
                         _previousBeat = 0;
                     }
 
@@ -82,16 +81,17 @@ namespace Rhetris
             }
             base.Update(gameTime);
         }
+
         protected override void Draw(GameTime gameTime)
         {
-            switch (state)
+            switch (State)
             {
                 case GameState.NewGame:
                     _drawer.ClearForNewgame();
-                    state = GameState.Playing;
+                    State = GameState.Playing;
                     break;
                 case GameState.Playing:
-                    _drawer.DrawAll(_oldNextFigure, _logic.NextFigure, _logic.Figure, _logic.score); 
+                    _drawer.DrawAll(_oldNextFigure, _logic.NextFigure, _logic.Figure, _logic.Score);
                     _drawer.DrawLabels();
                     _drawer.DrawLimit();
                     break;
@@ -110,23 +110,23 @@ namespace Rhetris
 
         public void GameOver()
         {
-            state = GameState.GameOver;
+            State = GameState.GameOver;
             _input.Clear();
             _input.Add(Buttons.Back, Keys.Escape, Exit);
             _input.Add(Buttons.B, Keys.Space, NewGame);
-            _input.Add(Buttons.DPadDown, Keys.Down, () => {});
-            _input.Add(Buttons.DPadLeft, Keys.Left, () => {});
-            _input.Add(Buttons.DPadRight, Keys.Right, () => {});
-            _input.Add(Buttons.LeftShoulder, Keys.Z, () => {});
-            _input.Add(Buttons.RightShoulder, Keys.X, () => {});
-            _input.Add(Buttons.A, Keys.Up, () => {});
+            _input.Add(Buttons.DPadDown, Keys.Down, () => { });
+            _input.Add(Buttons.DPadLeft, Keys.Left, () => { });
+            _input.Add(Buttons.DPadRight, Keys.Right, () => { });
+            _input.Add(Buttons.LeftShoulder, Keys.Z, () => { });
+            _input.Add(Buttons.RightShoulder, Keys.X, () => { });
+            _input.Add(Buttons.A, Keys.Up, () => { });
             _input.SetTouchActions(() => { }, () => { }, () => { }, () => { });
             _drawer.SetGameOver();
         }
 
         public void GameOverLabel()
         {
-            state = GameState.GameOverLabel;
+            State = GameState.GameOverLabel;
         }
 
         public void NewGame()
@@ -135,21 +135,30 @@ namespace Rhetris
             _input.Clear();
             _input.Add(Buttons.Back, Keys.Escape, Exit);
             _input.Add(Buttons.B, Keys.Space, () => _oldNextFigure = _logic.SwapFigure());
-            _input.Add(Buttons.DPadDown, Keys.Down, () => { _oldNextFigure = _logic.Drop(_previousBeat); _previousMovement = 0; });
+            _input.Add(Buttons.DPadDown, Keys.Down, () =>
+            {
+                _oldNextFigure = _logic.Drop(_previousBeat);
+                _previousMovement = 0;
+            });
             _input.Add(Buttons.DPadLeft, Keys.Left, () => _logic.MoveLeft());
             _input.Add(Buttons.DPadRight, Keys.Right, () => _logic.MoveRight());
             _input.Add(Buttons.LeftShoulder, Keys.Z, () => _logic.RotateCounterClockwize());
             _input.Add(Buttons.RightShoulder, Keys.X, () => _logic.RotateClockwize());
             _input.Add(Buttons.A, Keys.Up, () => _logic.RotateClockwize());
-            _input.SetTouchActions(() => _logic.MoveLeft(), () => _logic.MoveRight(), () => _logic.RotateClockwize(), () => { _oldNextFigure = _logic.Drop(_previousBeat); _previousMovement = 0; });
+            _input.SetTouchActions(() => _logic.MoveLeft(), () => _logic.MoveRight(), () => _logic.RotateClockwize(),
+                () =>
+                {
+                    _oldNextFigure = _logic.Drop(_previousBeat);
+                    _previousMovement = 0;
+                });
             _drawer.NewGame();
-            nextBeat = 500;
-            state = GameState.NewGame;
+            NextBeat = 500;
+            State = GameState.NewGame;
         }
 
         public void Win()
         {
-            state = GameState.Win;
+            State = GameState.Win;
             _input.Clear();
             _input.Add(Buttons.Back, Keys.Escape, Exit);
             _input.Add(Buttons.B, Keys.Space, NewGame);
@@ -164,15 +173,15 @@ namespace Rhetris
 
         public void CheckScore()
         {
-            if (Math.Abs(_logic.score.points) < (nextBeat * 0.35))
+            if (Math.Abs(_logic.Score.Points) < (NextBeat*0.35))
             {
-                _drawer.NextPalette();      
+                _drawer.NextPalette();
             }
             else
             {
                 _drawer.ResetPalette();
             }
-            _drawer.SetLimit((int)nextBeat * 0.35);
+            _drawer.SetLimit((int) NextBeat*0.35);
         }
     }
 }

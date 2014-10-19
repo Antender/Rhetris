@@ -1,20 +1,18 @@
 ﻿using System;
 using System.Linq;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Net;
 
 namespace Rhetris
 {
-
-    struct Score
+    internal struct Score
     {
-        public bool late;
-        public int points;
+        public bool Late;
+        public int Points;
 
         public Score(double delta, bool l)
         {
-            points = (int) delta;
-            late = l;
+            Points = (int) delta;
+            Late = l;
         }
     }
 
@@ -37,17 +35,17 @@ namespace Rhetris
         Z = 6
     }
 
-    class Logic
+    internal class Logic
     {
-        public Point[] Figure;
-        public Point[] NextFigure;
-        private Point[][] _figures;
         private readonly Rhetris _parent;
         public uint[,] Blocks;
+        public Point[] Figure;
+        public Point[] NextFigure;
         public Point Start;
-        public Score score;
-        public double time;
-        
+        private Point[][] _figures;
+        public Score Score;
+        public double Time;
+
         public Logic(Rhetris main)
         {
             _parent = main;
@@ -118,10 +116,10 @@ namespace Rhetris
         public void PlaceFigure()
         {
             Figure = new Point[NextFigure.Length];
-            for (var i = 0; i < NextFigure.Length; i++)
+            for (int i = 0; i < NextFigure.Length; i++)
             {
                 Figure[i] = new Point(NextFigure[i].X + Start.X, NextFigure[i].Y + Start.Y);
-                if (GetBlock(Figure[i]) != (uint)BlockType.Empty)
+                if (GetBlock(Figure[i]) != (uint) BlockType.Empty)
                 {
                     _parent.GameOver();
                 }
@@ -131,15 +129,15 @@ namespace Rhetris
 
         public void NewGame()
         {
-            _parent.state = GameState.Playing;
-            for (var i = 0; i < _parent.Height; i++)
+            _parent.State = GameState.Playing;
+            for (int i = 0; i < _parent.Height; i++)
             {
                 Blocks[0, i] = (uint) BlockType.Wall;
                 Blocks[_parent.Width - 1, i] = (uint) BlockType.Wall;
             }
-            for (var i = 1; i < _parent.Width - 1; i++)
+            for (int i = 1; i < _parent.Width - 1; i++)
             {
-                for (var j = 0; j < _parent.Height - 1; j++)
+                for (int j = 0; j < _parent.Height - 1; j++)
                 {
                     Blocks[i, j] = (uint) BlockType.Empty;
                 }
@@ -161,7 +159,7 @@ namespace Rhetris
 
         public void Move(Point direction)
         {
-            for (var i = 0; i < Figure.Length; i++)
+            for (int i = 0; i < Figure.Length; i++)
             {
                 Figure[i] = new Point(Figure[i].X + direction.X, Figure[i].Y + direction.Y);
             }
@@ -169,33 +167,33 @@ namespace Rhetris
 
         public void KillFigure()
         {
-            foreach (var block in Figure)
+            foreach (Point block in Figure)
             {
                 Blocks[block.X, block.Y] = (uint) BlockType.Dead;
             }
-            ComputeScore(_parent.nextBeat, time);
+            ComputeScore(_parent.NextBeat, Time);
             _parent.CheckScore();
             CheckDeleted();
         }
 
         public Point[] SwapFigure()
         {
-            var origin = Figure[0];
-            if (NextFigure.Any(block => Blocks[block.X + origin.X, block.Y + origin.Y] != (uint)BlockType.Empty))
+            Point origin = Figure[0];
+            if (NextFigure.Any(block => Blocks[block.X + origin.X, block.Y + origin.Y] != (uint) BlockType.Empty))
             {
                 return null;
             }
             var newNextFigure = new Point[NextFigure.Length];
-            var cleared = NextFigure;
-            for (var i = 0; i < Figure.Length; i++)
+            Point[] cleared = NextFigure;
+            for (int i = 0; i < Figure.Length; i++)
             {
                 Figure[i] = new Point(Figure[i].X - origin.X, Figure[i].Y - origin.Y);
             }
-            for (var i = 0; i < NextFigure.Length; i++)
+            for (int i = 0; i < NextFigure.Length; i++)
             {
                 newNextFigure[i] = new Point(NextFigure[i].X + origin.X, NextFigure[i].Y + origin.Y);
             }
-            var temp = Figure;
+            Point[] temp = Figure;
             Figure = newNextFigure;
             NextFigure = temp;
             return cleared;
@@ -203,10 +201,10 @@ namespace Rhetris
 
         public bool RotateClockwize()
         {
-            var origin = Figure[0];
+            Point origin = Figure[0];
             var temp = new Point[Figure.Length];
-            var rotated = true;
-            for (var i = 0; i < Figure.Length; i++)
+            bool rotated = true;
+            for (int i = 0; i < Figure.Length; i++)
             {
                 temp[i] = new Point(origin.X - Figure[i].Y + origin.Y, Figure[i].X - origin.X + origin.Y);
                 if ((temp[i].X >= 0) && (temp[i].Y >= 0) && (Blocks[temp[i].X, temp[i].Y] == (uint) BlockType.Empty))
@@ -223,10 +221,10 @@ namespace Rhetris
 
         public bool RotateCounterClockwize()
         {
-            var origin = Figure[0];
+            Point origin = Figure[0];
             var temp = new Point[Figure.Length];
-            var rotated = true;
-            for (var i = 0; i < Figure.Length; i++)
+            bool rotated = true;
+            for (int i = 0; i < Figure.Length; i++)
             {
                 temp[i] = new Point(origin.X + Figure[i].Y - origin.Y, origin.Y - Figure[i].X + origin.X);
                 if ((temp[i].X >= 0) && (temp[i].Y >= 0) && (Blocks[temp[i].X, temp[i].Y] == (uint) BlockType.Empty))
@@ -243,11 +241,11 @@ namespace Rhetris
 
         public void CheckDeleted()
         {
-            var shift = 0;
-            for (var i = _parent.Height-2; i >= 0; i--)
+            int shift = 0;
+            for (int i = _parent.Height - 2; i >= 0; i--)
             {
-                var full = true;
-                for (var j = 1; j < _parent.Width-1; j++)
+                bool full = true;
+                for (int j = 1; j < _parent.Width - 1; j++)
                 {
                     if (Blocks[j, i] != (uint) BlockType.Empty) continue;
                     full = false;
@@ -261,7 +259,7 @@ namespace Rhetris
                 {
                     if (shift > 0)
                     {
-                        for (var j = 1; j < _parent.Width - 1; j++)
+                        for (int j = 1; j < _parent.Width - 1; j++)
                         {
                             Blocks[j, i + shift] = Blocks[j, i];
                         }
@@ -276,7 +274,7 @@ namespace Rhetris
             {
                 Move(new Point(0, 1));
             }
-            var temp  = NextFigure;
+            Point[] temp = NextFigure;
             KillFigure();
             PlaceFigure();
             return temp;
@@ -305,31 +303,28 @@ namespace Rhetris
                 Move(new Point(0, 1));
                 return null;
             }
-            else //Tetromino dies. NextFigure is to be redrawn.
-            {
-                var temp = NextFigure;
-                KillFigure();
-                PlaceFigure();
-                return temp;
-            }
+            Point[] temp = NextFigure;
+            KillFigure();
+            PlaceFigure();
+            return temp;
         }
 
         public void ComputeScore(float nextBeat, double currentDelta)
         {
-            float dfuture = (float) (Math.Abs(nextBeat - currentDelta));
+            var dfuture = (float) (Math.Abs(nextBeat - currentDelta));
             if (currentDelta > dfuture)
             {
-                score = new Score(Math.Abs(dfuture),false);
+                Score = new Score(Math.Abs(dfuture), false);
             }
             else
             {
-                score = new Score(Math.Abs(currentDelta),true);
+                Score = new Score(Math.Abs(currentDelta), true);
             }
         }
 
         public void SetTime(double t)
         {
-            time = t;
+            Time = t;
         }
     }
 }

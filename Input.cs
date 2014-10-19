@@ -8,7 +8,7 @@ namespace Rhetris
 {
     public delegate void ReleasedEvent();
 
-    enum TouchAction : int
+    internal enum TouchAction
     {
         MoveLeft,
         MoveRight,
@@ -16,20 +16,23 @@ namespace Rhetris
         MoveDown
     }
 
-    struct ButtonEvent
+    internal struct ButtonEvent
     {
         public Buttons Button;
         public ReleasedEvent Released;
+
         public ButtonEvent(Buttons b, ReleasedEvent d)
         {
             Button = b;
             Released = d;
         }
     }
-    struct KeyEvent
+
+    internal struct KeyEvent
     {
         public Keys Key;
         public ReleasedEvent Released;
+
         public KeyEvent(Keys k, ReleasedEvent d)
         {
             Key = k;
@@ -39,120 +42,129 @@ namespace Rhetris
 
     public class Input
     {
-        private GamePadState oldGamepadState;
-        private KeyboardState oldKeyboardState;
-        private int _capacity;
-        private int _freeSlot;
+        private const int Mousevthreshold = 30;
+        private const int Mousehthreshold = 30;
         private readonly ButtonEvent[] _buttons;
         private readonly KeyEvent[] _keys;
-        private ReleasedEvent[] _touchevents = new ReleasedEvent[4];
-        private bool mousestate = false;
-        private int mousex = 0;
-        private int mousey = 0;
-        private const int mousevthreshold = 30;
-        private const int mousehthreshold = 30;
+        private readonly ReleasedEvent[] _touchevents = new ReleasedEvent[4];
+        private int _freeSlot;
+        private bool _mousestate;
+        private int _mousex;
+        private int _mousey;
+        private GamePadState _oldGamepadState;
+        private KeyboardState _oldKeyboardState;
+
         public Input(int cap)
         {
-            _capacity = cap;
+            Capacity = cap;
             _buttons = new ButtonEvent[cap];
             _keys = new KeyEvent[cap];
-            oldGamepadState = GamePad.GetState(PlayerIndex.One);
-            oldKeyboardState = Keyboard.GetState();
+            _oldGamepadState = GamePad.GetState(PlayerIndex.One);
+            _oldKeyboardState = Keyboard.GetState();
             for (int i = 0; i < 4; i++)
             {
                 _touchevents[i] = () => { };
             }
         }
+
+        public int Capacity { get; set; }
+
         public void Add(Buttons button, Keys key, ReleasedEvent callback)
         {
             _buttons[_freeSlot] = new ButtonEvent(button, callback);
             _keys[_freeSlot] = new KeyEvent(key, callback);
             _freeSlot++;
         }
+
         public void Update()
         {
-            var currentGamepadState = GamePad.GetState(PlayerIndex.One);
-            var currentKeyboardState = Keyboard.GetState();
-            foreach (var button in _buttons.Where(button => oldGamepadState.IsButtonDown(button.Button)).Where(button => currentGamepadState.IsButtonUp(button.Button)))
+            GamePadState currentGamepadState = GamePad.GetState(PlayerIndex.One);
+            KeyboardState currentKeyboardState = Keyboard.GetState();
+            foreach (
+                ButtonEvent button in
+                    _buttons.Where(button => _oldGamepadState.IsButtonDown(button.Button))
+                        .Where(button => currentGamepadState.IsButtonUp(button.Button)))
             {
                 button.Released();
             }
-            foreach (var key in _keys.Where(key => oldKeyboardState.IsKeyDown(key.Key)).Where(key => currentKeyboardState.IsKeyUp(key.Key)))
+            foreach (
+                KeyEvent key in
+                    _keys.Where(key => _oldKeyboardState.IsKeyDown(key.Key))
+                        .Where(key => currentKeyboardState.IsKeyUp(key.Key)))
             {
                 key.Released();
             }
-                var gesture = default(GestureSample);
+            GestureSample gesture = default(GestureSample);
 
-                while (TouchPanel.IsGestureAvailable)
-                    gesture = TouchPanel.ReadGesture();
+            while (TouchPanel.IsGestureAvailable)
+                gesture = TouchPanel.ReadGesture();
 
-                if (gesture.GestureType == GestureType.VerticalDrag)
-                {
-                    if (gesture.Delta.Y < 0)
-                        _touchevents[(int) TouchAction.MoveDown]();
-
-                    if (gesture.Delta.Y > 0)
-                        _touchevents[(int)TouchAction.MoveUp]();
-                }
-
-                if (gesture.GestureType == GestureType.HorizontalDrag)
-                {
-                    if (gesture.Delta.X < 0)
-                        _touchevents[(int)TouchAction.MoveLeft]();
-
-                    if (gesture.Delta.X > 0)
-                        _touchevents[(int)TouchAction.MoveRight]();
-                }
-            bool newmousestate = Mouse.GetState().LeftButton.HasFlag(ButtonState.Pressed);
-            if ((mousestate == true) && (newmousestate == false))
+            if (gesture.GestureType == GestureType.VerticalDrag)
             {
-                int dx = Mouse.GetState().X - mousex;
-                int dy = Mouse.GetState().Y - mousey;
+                if (gesture.Delta.Y < 0)
+                    _touchevents[(int) TouchAction.MoveDown]();
+
+                if (gesture.Delta.Y > 0)
+                    _touchevents[(int) TouchAction.MoveUp]();
+            }
+
+            if (gesture.GestureType == GestureType.HorizontalDrag)
+            {
+                if (gesture.Delta.X < 0)
+                    _touchevents[(int) TouchAction.MoveLeft]();
+
+                if (gesture.Delta.X > 0)
+                    _touchevents[(int) TouchAction.MoveRight]();
+            }
+            bool newmousestate = Mouse.GetState().LeftButton.HasFlag(ButtonState.Pressed);
+            if (_mousestate && (newmousestate == false))
+            {
+                int dx = Mouse.GetState().X - _mousex;
+                int dy = Mouse.GetState().Y - _mousey;
                 if (Math.Abs(dx) > Math.Abs(dy))
                 {
                     if (dx > 0)
                     {
-                        if (dx > mousehthreshold)
+                        if (dx > Mousehthreshold)
                         {
-                            _touchevents[(int)TouchAction.MoveRight]();
+                            _touchevents[(int) TouchAction.MoveRight]();
                         }
                     }
                     else
                     {
-                        if (Math.Abs(dx) > mousehthreshold)
+                        if (Math.Abs(dx) > Mousehthreshold)
                         {
-                            _touchevents[(int)TouchAction.MoveLeft]();
+                            _touchevents[(int) TouchAction.MoveLeft]();
                         }
-                       
                     }
                 }
                 else
                 {
                     if (dy > 0)
                     {
-                        if (dy > mousevthreshold)
+                        if (dy > Mousevthreshold)
                         {
-                            _touchevents[(int)TouchAction.MoveDown]();
+                            _touchevents[(int) TouchAction.MoveDown]();
                         }
                     }
                     else
                     {
-                        if (Math.Abs(dy) > mousevthreshold)
+                        if (Math.Abs(dy) > Mousevthreshold)
                         {
-                            _touchevents[(int)TouchAction.MoveUp]();
+                            _touchevents[(int) TouchAction.MoveUp]();
                         }
                     }
                 }
-                mousestate = false;
+                _mousestate = false;
             }
-            else if ((mousestate == false) && (newmousestate == true))
+            else if ((_mousestate == false) && newmousestate)
             {
-                mousestate = true;
-                mousex = Mouse.GetState().X;
-                mousey = Mouse.GetState().Y;
+                _mousestate = true;
+                _mousex = Mouse.GetState().X;
+                _mousey = Mouse.GetState().Y;
             }
-            oldGamepadState = currentGamepadState;
-            oldKeyboardState = currentKeyboardState;
+            _oldGamepadState = currentGamepadState;
+            _oldKeyboardState = currentKeyboardState;
         }
 
         public void Clear()

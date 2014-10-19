@@ -1,40 +1,35 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Media;
-using System.Runtime.InteropServices;
-using Microsoft.Xna.Framework.Audio;
 
 namespace Rhetris
 {
-    class Audio
+    internal class Audio
     {
-        Rhetris _parent;
-		private SoundPlayer beatPlayer;
-		private SoundPlayer sub_beatPlayer;
-		private bool even;
+        private readonly SoundPlayer _beatPlayer;
+        private readonly SoundPlayer _subBeatPlayer;
+        private bool _even;
 
-		public Audio(Rhetris parent)
+        public Audio(Rhetris parent)
         {
-            _parent = parent;
-            beatPlayer = new SoundPlayer(new FileStream("Content\\Audio\\beat.wav", FileMode.Open));
-			sub_beatPlayer = new SoundPlayer(new FileStream("Content\\Audio\\sub_beat.wav", FileMode.Open));
-
+            Parent = parent;
+            _beatPlayer = new SoundPlayer(new FileStream("Content\\Audio\\beat.wav", FileMode.Open));
+            _subBeatPlayer = new SoundPlayer(new FileStream("Content\\Audio\\sub_beat.wav", FileMode.Open));
         }
 
-        public void playBeat()
-        {
-			if(even == false)
-			{
-				beatPlayer.Play();
-				even = true;
-			}
-			else
-			{
-				sub_beatPlayer.Play();
-				even = false;
-			}
+        public Rhetris Parent { get; set; }
 
+        public void PlayBeat()
+        {
+            if (_even == false)
+            {
+                _beatPlayer.Play();
+                _even = true;
+            }
+            else
+            {
+                _subBeatPlayer.Play();
+                _even = false;
+            }
         }
     }
 }
