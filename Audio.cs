@@ -1,19 +1,26 @@
 ﻿using System.IO;
 using System.Media;
+using System.Net.Mime;
+using Microsoft.Xna.Framework.Audio;
+using Microsoft.Xna.Framework.Content;
 
 namespace Rhetris
 {
     internal class Audio
     {
-        private readonly SoundPlayer _beatPlayer;
-        private readonly SoundPlayer _subBeatPlayer;
+        private SoundEffect _beat;
+        private SoundEffect _subBeat;
         private bool _even;
 
         public Audio(Rhetris parent)
         {
             Parent = parent;
-            _beatPlayer = new SoundPlayer(new FileStream("Content\\Audio\\beat.wav", FileMode.Open));
-            _subBeatPlayer = new SoundPlayer(new FileStream("Content\\Audio\\sub_beat.wav", FileMode.Open));
+        }
+
+        public void LoadContent(ContentManager content)
+        {
+            _beat = content.Load<SoundEffect>("AudioContent/beat");
+            _subBeat = content.Load<SoundEffect>("AudioContent/sub_beat");
         }
 
         public Rhetris Parent { get; set; }
@@ -22,12 +29,12 @@ namespace Rhetris
         {
             if (_even == false)
             {
-                _beatPlayer.Play();
+                _beat.Play();
                 _even = true;
             }
             else
             {
-                _subBeatPlayer.Play();
+                _subBeat.Play();
                 _even = false;
             }
         }

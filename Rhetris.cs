@@ -51,6 +51,7 @@ namespace Rhetris
         {
             _drawer.LoadContent();
             _drawer.ResetPalette();
+            _audio.LoadContent(Content);
             base.LoadContent();
         }
 
