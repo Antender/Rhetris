@@ -39,6 +39,7 @@ namespace Rhetris
             _input = new Input(8);
             _random = new Random();
             _audio = new Audio(this);
+            TargetElapsedTime = TimeSpan.FromSeconds(1.0f / 1000.0f);
             NewGame();
         }
 
