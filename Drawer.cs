@@ -7,8 +7,13 @@ namespace Rhetris
 {
     internal class Drawer
     {
+        private readonly uint[] BaseColors =
+        {
+            0xFF00005A, 0xFF0000FF, 0xFF00CCFF, 0xFF33FF66,
+            0xFF99CC00, 0xFFCC3300, 0xFFCC0099, 0xFF877584
+        };
         private const int Palettewidth = 16;
-        private const int BasePalettewidth = 7;
+        private const int NumberOfPalettes = 7;
         private const int Blockwidth = 32;
         private const int Blockheight = 32;
         private const int GameOverSpeed = 5;
@@ -23,9 +28,9 @@ namespace Rhetris
         private Texture2D[] _palette;
         private Texture2D[][] _palettes;
         private SpriteBatch _spriteBatch;
-        public int Basepalette;
+        public int CurrentPalette;
         private Texture2D _blacktexture;
-        public int Currentpalette;
+        public int CurrentColor;
         private double _limit;
 
         public Drawer(Rhetris main, uint[,] gamefield)
@@ -42,43 +47,44 @@ namespace Rhetris
         public void LoadContent()
         {
             _spriteBatch = new SpriteBatch(_parent.GraphicsDevice);
-            _palettes = new Texture2D[BasePalettewidth][];
-            var palettedata = new uint[Blockwidth*Blockheight];
-            _blacktexture = new Texture2D(_parent.GraphicsDevice, Blockwidth, Blockheight);
-            for (int j = 0; j < Blockwidth*Blockheight; j++)
+            //Generating basic palettes
+            _palettes = new Texture2D[NumberOfPalettes][];
+            var texturedata = new uint[Blockwidth*Blockheight];
+            for (var currentpalette = 0; currentpalette < NumberOfPalettes; currentpalette++)
             {
-                palettedata[j] = Color.Black.PackedValue;
-            }
-            _blacktexture.SetData(palettedata);
-            for (int b = 0; b < BasePalettewidth; b++)
-            {
+                //Generating gradient for current palette
+                var difference = ((int)(BaseColors[currentpalette + 1] - BaseColors[currentpalette]))/(Palettewidth + 1);
                 _palette = new Texture2D[Palettewidth];
-                var basecolor = (uint) (
-                    ((((b + 1) & 0x00000001) == 0) ? 0 : 0x000000FF) +
-                    ((((b + 1) & 0x00000002) == 0) ? 0 : 0x00FF0000) +
-                    ((((b + 1) & 0x00000004) == 0) ? 0 : 0x0000FF00)
-                    );
-                for (int i = 0; i < Palettewidth; i++)
+                var color = BaseColors[currentpalette];
+                for (var currentcolor = 0; currentcolor < Palettewidth; currentcolor++)
                 {
-                    var color =
-                        (uint)
-                            ((basecolor/Palettewidth*i) + 0xFF000000);
-                    _palette[i] = new Texture2D(_parent.GraphicsDevice, Blockwidth, Blockheight);
-                    for (int j = 0; j < Blockwidth*Blockheight; j++)
+                    var texture = new Texture2D(_graphicsManager.GraphicsDevice, Blockwidth, Blockheight);
+                    color = (uint) (difference + color);
+                    //Filling texture with computed color
+                    for (var j = 0; j < Blockwidth*Blockheight; j++)
                     {
-                        palettedata[j] = color;
+                        texturedata[j] = color;
                     }
-                    _palette[i].SetData(palettedata);
+                    texture.SetData(texturedata);
+                    _palette[currentcolor] = texture;             
                 }
-                _palettes[b] = _palette;
+                _palettes[currentpalette] = _palette;
             }
+            //Generating black texture
+            _blacktexture = new Texture2D(_parent.GraphicsDevice, Blockwidth, Blockheight);
+            for (var j = 0; j < Blockwidth * Blockheight; j++)
+            {
+                texturedata[j] = Color.Black.PackedValue;
+            }
+            _blacktexture.SetData(texturedata);
+            //Generating background
             var backgrounddata = new uint[(_parent.Height - 2)*Blockheight*_parent.Width*Blockwidth];
             const uint darkbackground = 0xFF000000;
             const uint lightbackground = 0xFF101010;
             const uint wallcolor = 0xFF303030;
-            for (int k = 0; k < _parent.Width*Blockwidth*(_parent.Height - 3)*Blockheight; k++)
+            for (var k = 0; k < _parent.Width*Blockwidth*(_parent.Height - 3)*Blockheight; k++)
             {
-                int row = k%(_parent.Width*Blockwidth);
+                var row = k%(_parent.Width*Blockwidth);
                 if ((row < Blockwidth) || (row >= ((_parent.Width - 1)*Blockwidth)))
                 {
                     backgrounddata[k] = wallcolor;
@@ -95,7 +101,7 @@ namespace Rhetris
                     }
                 }
             }
-            for (int k = _parent.Width*Blockwidth*(_parent.Height - 3)*Blockheight;
+            for (var k = _parent.Width*Blockwidth*(_parent.Height - 3)*Blockheight;
                 k < _parent.Width*Blockwidth*(_parent.Height - 2)*Blockheight;
                 k++)
             {
@@ -128,7 +134,7 @@ namespace Rhetris
             }
             else
             {
-                _spriteBatch.Draw(_palettes[Currentpalette][blocktype + Basepalette],
+                _spriteBatch.Draw(_palettes[CurrentPalette][CurrentColor],
                     new Vector2(x*Blockwidth, y*Blockheight));
             }
         }
@@ -143,9 +149,9 @@ namespace Rhetris
         {
             Lock();
             _spriteBatch.Draw(_background, new Vector2(0, 0));
-            for (int x = 1; x < (_parent.Width - 1); ++x)
+            for (var x = 1; x < (_parent.Width - 1); ++x)
             {
-                for (int y = 2; y < _parent.Height - 1; ++y)
+                for (var y = 2; y < _parent.Height - 1; ++y)
                 {
                     if (_gamefield[x, y] != (uint) BlockType.Empty)
                     {
@@ -159,7 +165,7 @@ namespace Rhetris
         private void DrawFigure(Point[] figure, uint blocktype)
         {
             Lock();
-            foreach (Point block in figure)
+            foreach (var block in figure)
             {
                 Draw(block.X, (block.Y - 2), blocktype);
             }
@@ -169,7 +175,7 @@ namespace Rhetris
         private void DrawNextFigure(Point[] figure, uint blocktype)
         {
             Lock();
-            foreach (Point block in figure)
+            foreach (var block in figure)
             {
                 Draw(block.X + _nextFigure.X, block.Y + _nextFigure.Y, blocktype);
             }
@@ -191,7 +197,7 @@ namespace Rhetris
         public void DrawScore(Score score)
         {
             Lock();
-            for (int i = 14; i < 19; i++)
+            for (var i = 14; i < 19; i++)
             {
                 Draw(i, 7, (uint) BlockType.Empty);
             }
@@ -209,7 +215,7 @@ namespace Rhetris
         public void DrawGameOver(int color)
         {
             _goBlockColor = (uint) color;
-            for (int gocounter = 0; gocounter < GameOverSpeed; gocounter++)
+            for (var gocounter = 0; gocounter < GameOverSpeed; gocounter++)
             {
                 _goBlock = new Point(_goBlock.X + 1, _goBlock.Y);
                 if (_goBlock.X == _parent.Width)
@@ -241,25 +247,23 @@ namespace Rhetris
 
         public int GetAllColors()
         {
-            return Palettewidth*BasePalettewidth;
+            return Palettewidth*NumberOfPalettes;
         }
 
         public void NextPalette()
         {
-            Basepalette++;
-            if ((Basepalette + 3) == Palettewidth)
+            CurrentColor++;
+            if (CurrentColor != Palettewidth) return;
+            ResetPalette();
+            CurrentPalette++;
+            if (CurrentPalette == NumberOfPalettes)
             {
-                ResetPalette();
-                Currentpalette++;
-                if (Currentpalette == BasePalettewidth)
-                {
-                    _parent.Win();
-                }
-                else
-                {
-                    _palette = _palettes[Currentpalette];
-                    _parent.Speed = 3.0/(Currentpalette + 3.0);
-                }
+                _parent.Win();
+            }
+            else
+            {
+                _palette = _palettes[CurrentPalette];
+                _parent.Speed = 3.0/(CurrentPalette + 3.0);
             }
         }
 
@@ -267,20 +271,20 @@ namespace Rhetris
         {
             if (_palette != null)
             {
-                Basepalette = 1;
+                CurrentColor = 0;
             }
         }
 
         public void NewGame()
         {
-            Currentpalette = 0;
-            Basepalette = 1;
+            CurrentPalette = 0;
+            CurrentColor = 0;
         }
 
         public void ClearForNewgame()
         {
             Lock();
-            for (int i = 0; i < 7; i++)
+            for (var i = 0; i < 7; i++)
             {
                 Draw(_parent.Width + 1 + i, 10, (uint) BlockType.Empty);
             }
@@ -304,7 +308,7 @@ namespace Rhetris
         public void DrawLimit()
         {
             Lock();
-            for (int i = 14; i < 19; i++)
+            for (var i = 14; i < 19; i++)
             {
                 Draw(i, 9, (uint) BlockType.Empty);
             }

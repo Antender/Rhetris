@@ -1,7 +1,4 @@
-﻿using System.IO;
-using System.Media;
-using System.Net.Mime;
-using Microsoft.Xna.Framework.Audio;
+﻿using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 
 namespace Rhetris
