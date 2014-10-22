@@ -65,15 +65,17 @@ namespace Rhetris
                     _previousMovement += gameTime.ElapsedGameTime.TotalMilliseconds;
                     _previousBeat += gameTime.ElapsedGameTime.TotalMilliseconds;
                     _logic.SetTime(_previousBeat);
-                    if (_previousMovement > (2000.0*Speed))
-                    {
-                        _oldNextFigure = _logic.MoveDown();
-                        _previousMovement = 0;
-                    }
+//                    if (_previousMovement > (2000.0*Speed))
+//                    {
+//
+//                    }
                     if (_previousBeat > NextBeat)
                     {
+						_oldNextFigure = _logic.MoveDown();
+						_previousMovement = 0;
+
                         _audio.PlayBeat();
-                        NextBeat = 500;
+                        NextBeat = 2000.0f*Convert.ToSingle(Speed);
                         _previousBeat = 0;
                     }
 
