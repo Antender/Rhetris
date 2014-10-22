@@ -27,7 +27,7 @@ namespace Rhetris
         private Point[] _oldNextFigure;
         private double _previousBeat;
         private double _previousMovement;
-        public float NextBeat;
+        public double NextBeat;
         public GameState State;
 
         public Rhetris()
@@ -65,17 +65,13 @@ namespace Rhetris
                     _previousMovement += gameTime.ElapsedGameTime.TotalMilliseconds;
                     _previousBeat += gameTime.ElapsedGameTime.TotalMilliseconds;
                     _logic.SetTime(_previousBeat);
-//                    if (_previousMovement > (2000.0*Speed))
-//                    {
-//
-//                    }
                     if (_previousBeat > NextBeat)
                     {
 						_oldNextFigure = _logic.MoveDown();
 						_previousMovement = 0;
 
                         _audio.PlayBeat();
-                        NextBeat = 2000.0f*Convert.ToSingle(Speed);
+                        NextBeat = 2000.0*Speed;
                         _previousBeat = 0;
                     }
 

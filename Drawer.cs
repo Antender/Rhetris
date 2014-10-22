@@ -263,7 +263,7 @@ namespace Rhetris
             else
             {
                 _palette = _palettes[CurrentPalette];
-                _parent.Speed = 3.0/(CurrentPalette + 3.0);
+                _parent.Speed = 2.5/(CurrentPalette + 2.5);
             }
         }
 
