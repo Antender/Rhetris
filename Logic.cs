@@ -309,7 +309,7 @@ namespace Rhetris
             return temp;
         }
 
-        public void ComputeScore(float nextBeat, double currentDelta)
+        public void ComputeScore(double nextBeat, double currentDelta)
         {
             var dfuture = (float) (Math.Abs(nextBeat - currentDelta));
             if (currentDelta > dfuture)
