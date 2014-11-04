@@ -7,7 +7,7 @@ namespace Rhetris
 {
     internal class Drawer
     {
-        private readonly uint[] BaseColors =
+        private readonly uint[] _baseColors =
         {
             0xFF00005A, 0xFF0000FF, 0xFF00CCFF, 0xFF33FF66,
             0xFF99CC00, 0xFFCC3300, 0xFFCC0099, 0xFF877584
@@ -53,9 +53,9 @@ namespace Rhetris
             for (var currentpalette = 0; currentpalette < NumberOfPalettes; currentpalette++)
             {
                 //Generating gradient for current palette
-                var difference = ((int)(BaseColors[currentpalette + 1] - BaseColors[currentpalette]))/(Palettewidth + 1);
+                var difference = ((int)(_baseColors[currentpalette + 1] - _baseColors[currentpalette]))/(Palettewidth + 1);
                 _palette = new Texture2D[Palettewidth];
-                var color = BaseColors[currentpalette];
+                var color = _baseColors[currentpalette];
                 for (var currentcolor = 0; currentcolor < Palettewidth; currentcolor++)
                 {
                     var texture = new Texture2D(_graphicsManager.GraphicsDevice, Blockwidth, Blockheight);

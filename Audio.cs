@@ -10,7 +10,7 @@ namespace Rhetris
 		private SoundEffect _loop;
 		private SoundEffectInstance _loopInstance;
         private bool _even;
-		private bool _LoopStarted = false;
+		private bool _loopStarted;
 
         public Audio(Rhetris parent)
         {
@@ -45,10 +45,10 @@ namespace Rhetris
 
 		public void StartLoop()
 		{
-			if(_LoopStarted == false)
+			if(_loopStarted == false)
 			{
 				_loopInstance.Play();
-				_LoopStarted = true;
+				_loopStarted = true;
 			}
 		}
 	}

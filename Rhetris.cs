@@ -29,7 +29,7 @@ namespace Rhetris
         private double _previousMovement;
         public double NextBeat;
         public GameState State;
-		private bool _AudioLoopStarted = false;
+		private bool _audioLoopStarted = false;
 
 
         public Rhetris()
@@ -72,10 +72,10 @@ namespace Rhetris
 						_oldNextFigure = _logic.MoveDown();
 						_previousMovement = 0;
 
-						if(_AudioLoopStarted == false)
+						if(_audioLoopStarted == false)
 						{
 							_audio.StartLoop();
-							_AudioLoopStarted = true;
+							_audioLoopStarted = true;
 						}
 
                         NextBeat = 2000.0*Speed;
