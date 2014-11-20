@@ -36,10 +36,14 @@
     <ApplicationIcon>Icon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Audio.cs" />
-    <Compile Include="bmfont.cs" />
+    <Compile Include="Audio\Beat.cs" />
+    <Compile Include="Audio\Music.cs" />
     <Compile Include="Drawer.cs" />
-    <Compile Include="Input.cs" />
+    <Compile Include="Input\Controller.cs" />
+    <Compile Include="Input\GamePadController.cs" />
+    <Compile Include="Input\KeyboardController.cs" />
+    <Compile Include="Input\MouseController.cs" />
+    <Compile Include="Input\TouchController.cs" />
     <Compile Include="Logic.cs" />
     <Compile Include="Rhetris.cs" />
     <Compile Include="Program.cs" />
@@ -49,6 +53,9 @@
     <Reference Include="MonoGame.Framework, Version=3.1.2.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>packages\MonoGame.Binaries.3.2.0\build\net40\MonoGame.Framework.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoGameContentProcessors">
+      <HintPath>packages\MonoGame.ContentProcessors.3.2.1\lib\MonoGameContentProcessors.dll</HintPath>
     </Reference>
     <Reference Include="OpenTK">
       <HintPath>$(MSBuildExtensionsPath)\..\MonoGame\v3.0\Assemblies\WindowsGL\OpenTK.dll</HintPath>
@@ -77,7 +84,12 @@
     </Content>
     <Content Include="Icon.ico" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="XNAExtensions\XNAExtensions.csproj">
+      <Project>{bc3b10ea-c8e7-4540-a9f0-dfd289deb7d0}</Project>
+      <Name>XNAExtensions</Name>
+    </ProjectReference>
+  </ItemGroup>
   <ItemGroup>
     <Content Include="Content\Latin.fnt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
